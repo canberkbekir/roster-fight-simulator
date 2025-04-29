@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef2a67cd648501741b2e3fd27b08c4fc, type: 3}
+  m_Name: Testgenedata2
+  m_EditorClassIdentifier: 
+  geneName: 
+  geneDescription: 
+  geneIcon: {fileID: 0}
+  baseGenePassingChance: 0
+  geneFeatures:
+  - {fileID: 11400000, guid: a42df8b0cf250ba49b2307cb8dff4a5d, type: 2}

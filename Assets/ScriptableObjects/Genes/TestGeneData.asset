@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef2a67cd648501741b2e3fd27b08c4fc, type: 3}
+  m_Name: TestGeneData
+  m_EditorClassIdentifier: 
+  geneName: Color Gene
+  geneDescription: 
+  geneIcon: {fileID: 0}
+  baseGenePassingChance: 100
+  geneFeatures:
+  - {fileID: 11400000, guid: 743799ce42575ce48985c626b556d4b4, type: 2}
+  - {fileID: 11400000, guid: a42df8b0cf250ba49b2307cb8dff4a5d, type: 2}
+  - {fileID: 11400000, guid: 37ad3dff52e49334fb878659fdd5e415, type: 2}
+  - {fileID: 11400000, guid: bd20220fb1a4ae949aaf4e1fbdba957d, type: 2}
+  - {fileID: 11400000, guid: 8a9dfdf3846efce419752fb8ec2b9ff6, type: 2}
+  - {fileID: 11400000, guid: 3b0b4b1edae33ca4595cad0b622e62c8, type: 2}
