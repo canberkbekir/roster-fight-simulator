@@ -1,21 +1,22 @@
 using UnityEngine;
 
-namespace Genes.Base
+namespace Genes.Base.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "GeneData", menuName = "Genes/GeneData", order = 0)]
-    public class GeneData : ScriptableObject
+    public class GeneData : ScriptableObject,IGene
     {
         [SerializeField] private string geneName;
         [SerializeField] private string geneDescription;
         [SerializeField] private Sprite geneIcon;
         [SerializeField] private float baseGenePassingChance;
-        [SerializeField] private GeneFeature[] geneFeatures;
+        [SerializeField] private GeneFeatureData[] geneFeatures; 
         
-        
-        public GeneFeature[] GeneFeatures => geneFeatures;
+        public GeneFeatureData[] GeneFeatures => geneFeatures;
         public string GeneName => geneName;
         public string GeneDescription => geneDescription; 
         public Sprite GeneIcon => geneIcon;
-        public float BaseGenePassingChance => baseGenePassingChance;
-    }
+        public float GenePassingChance => baseGenePassingChance;
+        
+        
+    } 
 }

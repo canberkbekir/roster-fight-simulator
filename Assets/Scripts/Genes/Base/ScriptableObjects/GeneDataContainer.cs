@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Genes.Base
+namespace Genes.Base.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "GeneData", menuName = "Genes/Gene Data Container", order = 0)]
     public class GeneDataContainer : ScriptableObject

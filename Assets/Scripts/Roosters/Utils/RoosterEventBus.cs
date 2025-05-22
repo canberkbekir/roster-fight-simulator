@@ -1,15 +1,16 @@
 ﻿using System;
 using Genes;
+using Genes.Base;
 
 namespace Roosters
 {
     public class RoosterEventBus
     {
-        public event Action<GeneInstance[]> OnGeneInstancesUpdated; 
+        public event Action<Gene[]> OnGeneInstancesUpdated; 
         
-        public void RaiseGeneInstancesUpdated(GeneInstance[] geneInstances)
+        public void RaiseGeneInstancesUpdated(Gene[] genes)
         {
-            OnGeneInstancesUpdated?.Invoke(geneInstances);
+            OnGeneInstancesUpdated?.Invoke(genes);
         }
     }
 }

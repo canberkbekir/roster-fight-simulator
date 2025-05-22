@@ -1,5 +1,7 @@
 ﻿using Genes;
+using Genes.Base;
 using Genes.Features;
+using Genes.Features.Base;
 using Mirror;
 using Roosters.Handlers;
 using UnityEngine; 
@@ -19,11 +21,11 @@ namespace Roosters.Components
             
         }
 
-        private void OnGeneInstancesUpdated(GeneInstance[] obj)
+        private void OnGeneInstancesUpdated(Gene[] genes)
         {
-            foreach (var geneInstance in obj)
+            foreach (var gene in genes)
             {
-                foreach (var geneFeature in geneInstance.geneData.GeneFeatures)
+                foreach (var geneFeature in gene.GeneFeatures)
                 {
                     if (geneFeature is AppearanceGeneFeature feature)
                     {

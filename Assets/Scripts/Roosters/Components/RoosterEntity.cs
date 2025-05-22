@@ -2,29 +2,28 @@
 
 using System;
 using Genes.Base;
+using Genes.Base.ScriptableObjects;
 using Mirror;
 using UnityEngine;
 
 namespace Roosters.Components
 {
     public class RoosterEntity : NetworkBehaviour
-    {
-        [Header("Rooster Info")] public string roosterName;
-        public GeneData[] preReadyGenes = Array.Empty<GeneData>();
-
+    {  
         [SerializeField] private RoosterStats _stats;
         [SerializeField] private RoosterGenome _genome;
         [SerializeField] private RoosterSkills _skills;
         [SerializeField] private RoosterEquipment _equipment;
         [SerializeField] private RoosterAppearance _appearance;
+        [SerializeField] private string _name;
 
         public RoosterStats Stats { get; private set; }
         public RoosterGenome Genome { get; private set; }
         public RoosterSkills Skills { get; private set; }
         public RoosterEquipment Equipment { get; private set; }
-        public RoosterAppearance Appearance { get; private set; }
-
+        public RoosterAppearance Appearance { get; private set; } 
         public RoosterEventBus EventBus { get; private set; }
+        public string RoosterName => _name;
 
         
         private bool _isInitialized;
@@ -39,21 +38,15 @@ namespace Roosters.Components
             Appearance = _appearance != null ? _appearance : GetComponent<RoosterAppearance>();
         }
 
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            Init();
-        }
-
         /// <summary>
         /// Public entry point to run all your server‐side Init logic
         /// on a throw‐away instance.
         /// </summary>
-        public void Init()
+        public void Init(Gene[] genes)
         {
             if (_isInitialized) return;
             EventBus = new RoosterEventBus();
-            Genome.Init(this); 
+            Genome.Init(this,genes); 
             Stats.Init(this);
             Skills.Init(this);
             Equipment.Init(this);

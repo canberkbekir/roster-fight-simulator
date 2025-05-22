@@ -1,5 +1,6 @@
 using System;
 using Genes.Features;
+using Genes.Features.Base;
 using Mirror;
 using Roosters.Utils;
 using UnityEngine;

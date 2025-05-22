@@ -1,4 +1,5 @@
 ﻿using Genes.Features;
+using Genes.Features.Base;
 using Mirror;
 using UnityEngine;
 
@@ -71,13 +72,13 @@ namespace Roosters.Utils
                 if (netIdentity.netId == 0)
                 {
                     // Pre-spawn on server: seed the initial color
-                    _partColor = gene.colorValue;
+                    _partColor = gene.ColorValue;
                     ApplyColor(_partColor); 
                 }
                 else
                 {
                     // Post-spawn on server: update SyncVar normally
-                    _partColor = gene.colorValue;
+                    _partColor = gene.ColorValue;
                 }
             }
             else
@@ -86,7 +87,7 @@ namespace Roosters.Utils
                 if (netIdentity.netId != 0)
                 {
                     // Only send a Cmd once we've got a valid netId
-                    CmdSetColor(gene.colorValue);
+                    CmdSetColor(gene.ColorValue);
                 }
                 // else: ignore pre-spawn client events
             }

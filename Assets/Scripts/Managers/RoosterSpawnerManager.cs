@@ -1,8 +1,9 @@
-using System;
 using Genes.Base;
+using Genes.Base.ScriptableObjects;
 using InventorySystem.Base;
-using Mirror;
-using Roosters.Components;
+using Mirror; 
+using Roosters;
+using Roosters.Components; 
 using UnityEngine;
 
 namespace Managers
@@ -22,33 +23,34 @@ namespace Managers
         private void CmdSpawnRandomRooster(Vector3 spawnPos, Quaternion spawnRot)
         {
             var randomGene = geneDataContainer.GetRandomGene();
-            var tempEntity = CreateTemporaryRooster(randomGene);
-            var stateJson = JsonUtility.ToJson(new RoosterState(tempEntity));
+            var tempEntity = CreateTemporaryRoosterEntity(randomGene);
+            var rooster = new Rooster(tempEntity); 
             Destroy(tempEntity.gameObject);
-            SpawnItemWorld(spawnPos, spawnRot, stateJson);
+            SpawnItemWorld(spawnPos, spawnRot, rooster);
         }
 
-        private RoosterEntity CreateTemporaryRooster(GeneData gene)
+        private RoosterEntity CreateTemporaryRoosterEntity(GeneData geneData)
         {
             if (roosterEntityPrefab == null)
-                throw new UnassignedReferenceException("roosterEntityPrefab is not assigned in RoosterSpawnerManager");
-            var tempGO = Instantiate(roosterEntityPrefab);
-            var entity = tempGO.GetComponent<RoosterEntity>();
-            entity.preReadyGenes = new[] { gene };
-            entity.Init();
-            return entity;
+                throw new UnassignedReferenceException("roosterEntityPrefab must be assigned in RoosterSpawnerManager.");
+
+            GameObject instance = Instantiate(roosterEntityPrefab);
+            var rooster = instance.GetComponent<RoosterEntity>();
+            if (rooster == null)
+                throw new MissingComponentException($"RoosterEntity component missing on prefab '{roosterEntityPrefab.name}'.");
+
+            rooster.Init(new[] { new Gene(geneData) });
+            return rooster;
         }
 
-        private void SpawnItemWorld(Vector3 position, Quaternion rotation, string metaJson)
+        private void SpawnItemWorld(Vector3 position, Quaternion rotation, Rooster rooster)
         {
             if (roosterEntityPrefab == null)
                 throw new UnassignedReferenceException("roosterEntityPrefab is not assigned in RoosterSpawnerManager");
             var itemGO = Instantiate(roosterEntityPrefab, position, rotation);
-            var entity = itemGO.GetComponent<RoosterEntity>();
-            entity.Init();
-            var stateJson = JsonUtility.ToJson(new RoosterState(entity));
+            var entity = itemGO.GetComponent<RoosterEntity>(); 
             var itemWorld = itemGO.GetComponent<ItemWorld>();
-            itemWorld.SetMetaJson(stateJson);
+            // itemWorld.SetMetaJson(stateJson);
             NetworkServer.Spawn(itemGO, connectionToClient);
         }
     }

@@ -1,9 +1,15 @@
-using UnityEngine;
+﻿using System;
+using Genes.Base.ScriptableObjects;
 
 namespace Genes.Base
 {
-    public abstract class GeneFeature : ScriptableObject
-    {
+    [Serializable]
+    public abstract class GeneFeature : IGeneFeature
+    { 
+    }
     
+    public interface IGeneFeature
+    {
+        
     }
 }

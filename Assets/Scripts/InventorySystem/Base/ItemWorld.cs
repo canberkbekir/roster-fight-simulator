@@ -2,7 +2,8 @@ using UnityEngine;
 using Mirror;
 using Interactions.Base;
 using Managers;
-using Players; // for GameManager
+using Players;
+using Roosters; // for GameManager
 using Roosters.Components; // for RoosterState
 
 namespace InventorySystem.Base
@@ -37,7 +38,7 @@ namespace InventorySystem.Base
 
                 if (!string.IsNullOrEmpty(metaJson))
                 {
-                    var state = JsonUtility.FromJson<RoosterState>(metaJson);
+                    var state = JsonUtility.FromJson<Rooster>(metaJson);
                     return $"Pick up {state.Name}";
                 }
 

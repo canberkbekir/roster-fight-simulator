@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Genes;
+using Genes.Base;
 using Mirror;
 
 namespace Roosters.Components
@@ -7,25 +8,22 @@ namespace Roosters.Components
     public class RoosterGenome : NetworkBehaviour, IRoosterComponent
     {
         private RoosterEntity _owner;
-        private GeneInstance[] _geneInstances;
-        public GeneInstance[] GeneInstances => _geneInstances;
+        private Gene[] _genes;
+        public Gene[] Genes => _genes;
         
-        public void Init(RoosterEntity entity)
-        {
-            _owner = entity;
-            if (entity.preReadyGenes == null || !entity.preReadyGenes.Any()) return;
+        public void Init(RoosterEntity owner,Gene[] genes)
+        { 
+            if(_owner) return;
+            _owner = owner;
             
-            _geneInstances = entity.preReadyGenes
-                .Select(preReadyGene => new GeneInstance(preReadyGene))
-                .ToArray();
-                                  
-            SetGeneInstances(_geneInstances);
+            if(!genes.Any()) return; 
+            SetGeneInstances(genes);
         }
         
-        public void SetGeneInstances(GeneInstance[] geneInstances)
+        public void SetGeneInstances(Gene[] newGenes)
         {
-            _geneInstances = geneInstances;
-            _owner.EventBus?.RaiseGeneInstancesUpdated(_geneInstances);
+            _genes = newGenes;
+            _owner.EventBus?.RaiseGeneInstancesUpdated(_genes);
         }
     }
 }

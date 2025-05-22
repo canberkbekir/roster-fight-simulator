@@ -1,17 +1,18 @@
 using Genes.Base;
+using Genes.Base.ScriptableObjects;
 
 namespace Genes
 {
     [System.Serializable]
     public class GeneInstance
     {
-        public GeneData geneData;  
+        public Gene gene;  
         public float currentPassingChance;   
 
-        public GeneInstance(GeneData geneData)
+        public GeneInstance(Gene newGene)
         {
-            this.geneData = geneData;
-            currentPassingChance = geneData.BaseGenePassingChance;  
+            gene = newGene;
+            currentPassingChance = gene.GenePassingChance;
         } 
          
         public void UpdatePassingChance(float factor)
