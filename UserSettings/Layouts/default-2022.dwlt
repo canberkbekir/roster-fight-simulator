@@ -1028,7 +1028,7 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 0.5934416, y: 1.2608286, z: -0.31429905}
+    m_Target: {x: -21.594465, y: -2.9922771, z: -2.7758386}
     speed: 2
     m_Value: {x: 0.5934416, y: 1.2608286, z: -0.31429905}
   m_RenderMode: 0
@@ -1041,7 +1041,7 @@ MonoBehaviour:
   m_SceneViewState:
     m_AlwaysRefresh: 0
     showFog: 1
-    showSkybox: 0
+    showSkybox: 1
     showFlares: 1
     showImageEffects: 1
     showParticleSystems: 1
@@ -1076,11 +1076,11 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.1337443, y: 0.33890906, z: -0.04865401, w: -0.9299394}
+    m_Target: {x: 0.07027213, y: -0.6668514, z: 0.06342996, w: 0.7390911}
     speed: 2
-    m_Value: {x: -0.13375089, y: 0.33892578, z: -0.048656408, w: -0.9299852}
+    m_Value: {x: -0.1337443, y: 0.33890906, z: -0.04865401, w: -0.92993945}
   m_Size:
-    m_Target: 0.41775182
+    m_Target: 9.625229
     speed: 2
     m_Value: 0.41775182
   m_Ortho:
