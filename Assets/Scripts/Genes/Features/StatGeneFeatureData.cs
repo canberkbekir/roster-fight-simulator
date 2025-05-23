@@ -9,6 +9,8 @@ namespace Genes.Features
     [CreateAssetMenu(fileName = "StatGeneFeature", menuName = "Genes/StatGeneFeature", order = 0)]
     public class StatGeneFeatureData : GeneFeatureData ,IStatGeneFeature
     {
+        [HideInInspector] public new GeneFeatureType GeneFeatureType => GeneFeatureType.Stat;
+        
         [SerializeField] private StatType statType;
         [SerializeField] private int value;
 

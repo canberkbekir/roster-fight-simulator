@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef2a67cd648501741b2e3fd27b08c4fc, type: 3}
   m_Name: Testgenedata2
   m_EditorClassIdentifier: 
+  geneId: 2
   geneName: 
   geneDescription: 
   geneIcon: {fileID: 0}

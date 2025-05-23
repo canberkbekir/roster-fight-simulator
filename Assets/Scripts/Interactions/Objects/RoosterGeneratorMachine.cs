@@ -12,7 +12,7 @@ namespace Interactions.Objects
         public override void OnInteract(GameObject interactor)
         {
             base.OnInteract(interactor);
-            GameManager.Instance.RoosterSpawnerManager.RequestSpawnAt(spawnPoint);   
+            GameManager.Instance.RoosterSpawnerManager.RequestSpawnRandomRoosterAt(spawnPoint);   
         }
     }
 }

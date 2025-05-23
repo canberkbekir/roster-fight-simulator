@@ -2,6 +2,7 @@
 using InventorySystem.Base;
 using Managers;
 using Mirror;
+using Roosters;
 using UnityEngine;
 
 namespace Players
@@ -73,17 +74,17 @@ namespace Players
         }
 
         [Server]
-        public void AddItem(string itemId, int qty, string metaJson)
+        public void AddItem(string itemId, int qty, Rooster rooster)
         {
             if (items.Count >= maxSlots &&
-                items.All(i => !(i.ItemId == itemId && i.MetaJson == metaJson && i.IsStackable)))
+                items.All(i => !(i.ItemId == itemId && i.Rooster == rooster && i.IsStackable)))
             {
                 Debug.LogWarning($"Inventory full – cannot add {itemId}");
                 return;
             }
 
             var existing = items.FirstOrDefault(i =>
-                i.ItemId == itemId && i.MetaJson == metaJson && i.IsStackable);
+                i.ItemId == itemId && i.Rooster == rooster && i.IsStackable);
 
             if (!existing.IsEmpty)
             {
@@ -93,12 +94,12 @@ namespace Players
             else
             {
                 int addQty = Mathf.Min(qty, maxStackSize);
-                items.Add(new InventoryItem(itemId, ItemType.Resource, addQty, metaJson));
+                items.Add(new InventoryItem(itemId, ItemType.Resource, addQty, rooster));
             }
         }
 
         [Server]
-        public void AddRooster(string metaJson)
+        public void AddRooster(Rooster rooster)
         {
             if (items.Count >= maxSlots)
             {
@@ -106,13 +107,13 @@ namespace Players
                 return;
             }
 
-            items.Add(new InventoryItem(string.Empty, ItemType.Rooster, 1, metaJson));
+            items.Add(new InventoryItem(string.Empty, ItemType.Rooster, 1, rooster));
         }
 
         [Server]
-        public void RemoveItem(string itemId, int qty, string metaJson)
+        public void RemoveItem(string itemId, int qty, Rooster rooster)
         {
-            var existing = items.FirstOrDefault(i => i.ItemId == itemId && i.MetaJson == metaJson);
+            var existing = items.FirstOrDefault(i => i.ItemId == itemId && i.Rooster == rooster);
             if (existing.IsEmpty) return;
 
             int keep = existing.Quantity - qty;
@@ -124,37 +125,34 @@ namespace Players
         }
 
         [Command]
-        public void CmdAddItem(string id, int q, string m) => AddItem(id, q, m);
+        public void CmdAddItem(string id, int q, Rooster r) => AddItem(id, q, r);
 
         [Command]
-        public void CmdAddRooster(string m) => AddRooster(m);
+        public void CmdAddRooster(Rooster r) => AddRooster(r);
 
         [Command]
-        public void CmdRemoveItem(string id, int q, string m) => RemoveItem(id, q, m);
+        public void CmdRemoveItem(string id, int q, Rooster r) => RemoveItem(id, q, r);
 
         [Command]
         public void CmdDropSlot(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= items.Count) return;
             var item = items[slotIndex];
+            var dropPos = transform.position + transform.forward * dropDistance;
 
-            Vector3 dropPos = transform.position + transform.forward * dropDistance;
-            GameObject worldGO;
             if (item.IsRooster)
             {
-                if (roosterItemWorldPrefab == null)
-                    throw new UnassignedReferenceException("roosterItemWorldPrefab not assigned");
-                worldGO = Instantiate(roosterItemWorldPrefab, dropPos, Quaternion.identity);
-                worldGO.GetComponent<ItemWorld>().SetMetaJson(item.MetaJson);
+                // only spawn via your Networked spawner
+                GameManager.Instance.RoosterSpawnerManager.RequestSpawnRoosterAt(dropPos, item.Rooster);
             }
             else
             {
                 var data = GameManager.Instance.ContainerManager.ItemDataContainer.Get(item.ItemId);
-                worldGO = Instantiate(data.WorldPrefab, dropPos, Quaternion.identity);
+                Instantiate(data.WorldPrefab, dropPos, Quaternion.identity);
             }
 
-            NetworkServer.Spawn(worldGO, connectionToClient);
-            RemoveItem(item.ItemId, 1, item.MetaJson);
+            RemoveItem(item.ItemId, 1, item.Rooster);
         }
+
     }
 }

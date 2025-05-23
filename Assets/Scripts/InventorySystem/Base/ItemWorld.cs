@@ -17,7 +17,7 @@ namespace InventorySystem.Base
 
         [Tooltip("JSON metadata for dynamic items (serialized state).")]
         [TextArea]
-        [SerializeField] private string metaJson;
+        [SerializeField] private Rooster rooster;
 
         private ItemData _data;
         private ItemDataContainer _db;
@@ -36,12 +36,10 @@ namespace InventorySystem.Base
                 if (_data != null)
                     return $"Pick up {_data.DisplayName}";
 
-                if (!string.IsNullOrEmpty(metaJson))
-                {
-                    var state = JsonUtility.FromJson<Rooster>(metaJson);
-                    return $"Pick up {state.Name}";
-                }
-
+                if (rooster != null)
+                { 
+                    return $"Pick up {rooster.Name}";
+                } 
                 return "Pick up";
             }
         }
@@ -51,12 +49,12 @@ namespace InventorySystem.Base
         {
             base.OnInteract(interactor);
             var inv = interactor.GetComponent<Players.PlayerReferenceHandler>()?.PlayerInventory;
-            if (inv == null) return;
+            if (!inv) return;
 
-            if (_data != null)
+            if (_data)
                 inv.AddItem(_data.ItemId, 1, null);
             else
-                inv.AddRooster(metaJson);
+                inv.AddRooster(rooster);
 
             NetworkServer.Destroy(gameObject);
         }
@@ -65,11 +63,11 @@ namespace InventorySystem.Base
         /// Server-only setter for dynamic item JSON before spawning.
         /// </summary>
         [Server]
-        public void SetMetaJson(string json)
+        public void SetRooster(Rooster newRooster)
         {
             itemId   = null;
             _data    = null;
-            metaJson = json;
+            rooster = newRooster;
         }
     }
 }

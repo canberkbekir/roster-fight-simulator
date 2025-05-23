@@ -24,6 +24,7 @@ namespace Roosters.Components
         public RoosterAppearance Appearance { get; private set; } 
         public RoosterEventBus EventBus { get; private set; }
         public string RoosterName => _name;
+        public Rooster Rooster { get;  set; }
 
         
         private bool _isInitialized;
@@ -42,16 +43,17 @@ namespace Roosters.Components
         /// Public entry point to run all your server‐side Init logic
         /// on a throw‐away instance.
         /// </summary>
-        public void Init(Gene[] genes)
+        public void Init(Rooster rooster)
         {
+            Rooster = rooster ?? throw new ArgumentNullException(nameof(rooster));
             if (_isInitialized) return;
             EventBus = new RoosterEventBus();
-            Genome.Init(this,genes); 
             Stats.Init(this);
             Skills.Init(this);
             Equipment.Init(this);
             Appearance.Init(this);
+            Genome.Init(this,rooster.Genes);  
             _isInitialized = true;
-        }
+        } 
     }
 }

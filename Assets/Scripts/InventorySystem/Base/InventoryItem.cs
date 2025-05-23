@@ -1,4 +1,5 @@
 ﻿using System;
+using Roosters;
 using UnityEngine;
 
 namespace InventorySystem.Base
@@ -9,49 +10,44 @@ namespace InventorySystem.Base
         [SerializeField] private readonly string _itemId;
         [SerializeField] private readonly ItemType _itemType;
         [SerializeField] private readonly int    _quantity;
-        [SerializeField] private readonly string _metaJson;
+        [SerializeField] private readonly Rooster _rooster;
 
         public string ItemId    => _itemId;       // matches ItemData.ItemId
         public ItemType Type    => _itemType;     // e.g. Resource, Equipment, Rooster
         public int Quantity     => _quantity;     // how many in this stack
-        public string MetaJson  => _metaJson;     // optional JSON blob
+        public Rooster Rooster  => _rooster;     // optional JSON blob
 
-        public bool HasMetadata => !string.IsNullOrEmpty(_metaJson);
+        public bool HasRooster => Rooster != null;
         public bool IsRooster   => _itemType == ItemType.Rooster;
         public bool IsStackable => !IsRooster;    // roosters are unique/non-stackable
-        public bool IsEmpty     => string.IsNullOrEmpty(_itemId) && !HasMetadata;
+        public bool IsEmpty     => string.IsNullOrEmpty(_itemId) && !HasRooster;
 
         // Primary constructor
-        public InventoryItem(string itemId, ItemType type, int quantity = 1, string metaJson = null)
+        public InventoryItem(string itemId, ItemType type, int quantity = 1, Rooster rooster = null)
         {
             _itemId   = itemId;
             _itemType = type;
             _quantity = quantity;
-            _metaJson = metaJson;
+            _rooster = rooster;
         }
 
         // Returns a copy with a different quantity
         public InventoryItem WithQuantity(int newQty)
-            => new InventoryItem(_itemId, _itemType, newQty, _metaJson);
-
-        // Returns a copy with updated metadata
-        public InventoryItem WithMetadata(string metaJson)
-            => new InventoryItem(_itemId, _itemType, _quantity, metaJson);
-
+            => new InventoryItem(_itemId, _itemType, newQty, _rooster); 
         public override string ToString()
-            => $"{_itemType}:{_itemId} x{_quantity}" + (HasMetadata ? " [meta]" : "");
+            => $"{_itemType}:{_itemId} x{_quantity}" + (HasRooster ? " [meta]" : "");
 
         // Equality implementations for SyncList lookups
         public bool Equals(InventoryItem other)
             => _itemId   == other._itemId
                && _itemType == other._itemType
                && _quantity == other._quantity
-               && _metaJson == other._metaJson;
+               && _rooster == other._rooster;
 
         public override bool Equals(object obj)
             => obj is InventoryItem other && Equals(other);
 
         public override int GetHashCode()
-            => HashCode.Combine(_itemId, _itemType, _quantity, _metaJson);
+            => HashCode.Combine(_itemId, _itemType, _quantity, _rooster);
     }
 }

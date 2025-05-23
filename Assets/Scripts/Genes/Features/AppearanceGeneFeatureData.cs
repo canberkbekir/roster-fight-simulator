@@ -27,6 +27,8 @@ namespace Genes.Features
     [CreateAssetMenu(fileName = "AppearanceGeneFeature", menuName = "Genes/AppearanceGeneFeature", order = 0)]
     public class AppearanceGeneFeatureData : GeneFeatureData, IAppearanceGeneFeature
     {
+        [HideInInspector] public new GeneFeatureType GeneFeatureType => GeneFeatureType.Appearance;
+        
         [Header("Appearance Gene Feature")]
         [SerializeField] private AppearanceGeneType appearanceGeneType;
         [SerializeField] private AppearanceEffectType appearanceEffectType;

@@ -14,6 +14,8 @@ namespace Genes.Features
     [CreateAssetMenu(fileName = "SkillGeneFeature", menuName = "Genes/SkillGeneFeature", order = 0)]
     public class SkillGeneFeatureData : GeneFeatureData,ISkillGeneFeature
     {
+        [HideInInspector] public new GeneFeatureType GeneFeatureType => GeneFeatureType.Skill;
+        
         [SerializeField] private SkillGeneType skillGeneType;
         [SerializeField] private string skillName;
         [SerializeField] private string skillDescription;
