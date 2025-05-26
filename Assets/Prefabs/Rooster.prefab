@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 199709018015015639}
   - component: {fileID: 7509599651277130930}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Genomes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 176423796149234442}
   - component: {fileID: 1612633076359501164}
   - component: {fileID: 1903671434296047032}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Appearances
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 6753948135621903776}
   - component: {fileID: 444869691022592335}
   - component: {fileID: 7782004466711691801}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -232,7 +232,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5701358962334392765}
   - component: {fileID: 1969164283772462624}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Equipments
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,7 +278,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1759013288314928208}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BodyParts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +312,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5810834668952653566}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Wings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -348,7 +348,7 @@ GameObject:
   - component: {fileID: 5370789052314369540}
   - component: {fileID: 2513322077883504031}
   - component: {fileID: 1381224631361202204}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Right Wing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 6208004796537373996}
   - component: {fileID: 1808812090510814352}
   - component: {fileID: 6654454646165329126}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -552,7 +552,7 @@ GameObject:
   - component: {fileID: 4433597244406059720}
   - component: {fileID: 280514819686962120}
   - component: {fileID: 1571994101774147552}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Left Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -651,7 +651,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2625462451246624676}
   - component: {fileID: 5362305342544611500}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Stats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -703,7 +703,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8843043415115546139}
   - component: {fileID: 2065036491880887265}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Skills
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -752,7 +752,7 @@ GameObject:
   - component: {fileID: 6278788732288706523}
   - component: {fileID: 6488493254398870709}
   - component: {fileID: 2056904677598762825}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Left Wing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -853,7 +853,7 @@ GameObject:
   - component: {fileID: 6208962284403062722}
   - component: {fileID: 189283036941929813}
   - component: {fileID: 3727033577938086699}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -954,7 +954,7 @@ GameObject:
   - component: {fileID: 5427652958542589049}
   - component: {fileID: 5046807422424314848}
   - component: {fileID: 2696238136684117164}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Beak
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1052,7 +1052,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3749508669699163999}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Legs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1088,7 +1088,7 @@ GameObject:
   - component: {fileID: 3151907053372408008}
   - component: {fileID: 8221813598731336537}
   - component: {fileID: 8262302972713799434}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Right Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1192,7 +1192,7 @@ GameObject:
   - component: {fileID: 2142081051507048970}
   - component: {fileID: 5474402831220189575}
   - component: {fileID: 3575680096342574043}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rooster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1332,13 +1332,12 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  roosterName: Rooster Test
-  preReadyGenes: []
   _stats: {fileID: 5362305342544611500}
   _genome: {fileID: 7509599651277130930}
   _skills: {fileID: 2065036491880887265}
   _equipment: {fileID: 1969164283772462624}
   _appearance: {fileID: 1612633076359501164}
+  _name: 
 --- !u!114 &3575680096342574043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1356,7 +1355,6 @@ MonoBehaviour:
   syncInterval: 0
   interactionPrompt: Press E to interact
   itemId: 
-  metaJson: 
 --- !u!1 &8281196761010271120
 GameObject:
   m_ObjectHideFlags: 0
@@ -1366,7 +1364,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5689943460716717034}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Managers
   m_TagString: Untagged
   m_Icon: {fileID: 0}

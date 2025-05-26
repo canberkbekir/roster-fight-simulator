@@ -28,6 +28,10 @@ namespace InventorySystem.Base
         /// </summary>
         public ItemData Get(string itemId)
         {
+            if(itemId== null)
+            { 
+                return null;
+            }
             if (_lookup != null && _lookup.TryGetValue(itemId, out var data))
                 return data;
 

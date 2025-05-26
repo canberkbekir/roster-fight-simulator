@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 using Mirror;
 using Interactions.Base;
 using UI;
+using Unity.VisualScripting;
 
 namespace Players
 {
@@ -15,6 +17,10 @@ namespace Players
         private InteractableBase currentBase;
         private Camera cam;
         private InteractUI ui;
+        
+        public event Action<InteractableBase> OnHoverEnter;
+        public event Action<InteractableBase> OnHoverExit; 
+        public event Action<InteractableBase> OnInteracted;
 
         void Update()
         {
@@ -26,8 +32,9 @@ namespace Players
             {
                 if (next != current)
                 {
-                    current = next;
-                    ui.Show(current.InteractionPrompt);
+                    current = next; 
+                    currentBase = hit.collider.GetComponent<InteractableBase>();
+                    OnHoverEnter?.Invoke(currentBase); 
                 }
 
                 if (Input.GetKeyDown(KeyCode.E)
@@ -39,15 +46,15 @@ namespace Players
             else if (current != null)
             {
                 current = null;
-                ui.Hide();
+                currentBase = null;
+                OnHoverExit?.Invoke(currentBase); 
             }
         }
 
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
-            cam = refs.PlayerCamera;
-            ui = refs.InteractUI;
+            cam = refs.PlayerCamera; 
         }
 
         [Command]
@@ -59,6 +66,7 @@ namespace Players
  
             interactable.OnInteract(connectionToClient.identity.gameObject); 
             interactable.RpcOnInteract();
+            OnInteracted?.Invoke(interactable);
         }
     }
 }

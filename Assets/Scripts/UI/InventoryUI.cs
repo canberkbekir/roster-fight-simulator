@@ -1,3 +1,4 @@
+using System;
 using InventorySystem.Base;
 using Managers;
 using Mirror;
@@ -6,11 +7,8 @@ using UnityEngine;
 
 namespace UI
 {
-    public class InventoryUI : MonoBehaviour
+    public class InventoryUI : BaseUI
     {
-        [Header("References")]
-        [SerializeField]
-        private PlayerReferenceHandler playerReferenceHandler;
 
         [SerializeField, Tooltip("Slot prefab with InventorySlotUI component.")]
         private InventorySlotUI slotPrefab; 
@@ -24,14 +22,30 @@ namespace UI
         
         private InventorySlotUI[] _slots;
         private PlayerInventory   _inventory;
+        private PlayerReferenceHandler _playerReferenceHandler;
+
 
         private void Start()
         {
             if (!NetworkClient.active) return;
             var localPlayer = NetworkClient.localPlayer;
-            if (localPlayer == null) return;
+            if (localPlayer == null) return; 
+        }
 
-            _inventory = playerReferenceHandler.PlayerInventory 
+        private void OnEnable()
+        {
+            PlayerReferenceHandler.LocalPlayerReady += OnLocalPlayerReady;
+        }
+        
+        private void OnDisable()
+        {
+            PlayerReferenceHandler.LocalPlayerReady -= OnLocalPlayerReady; 
+        }
+
+        private void OnLocalPlayerReady(PlayerReferenceHandler obj)
+        {
+            _playerReferenceHandler = obj ?? throw new System.Exception("PlayerReferenceHandler is null.");
+            _inventory = _playerReferenceHandler.PlayerInventory 
                          ?? throw new System.Exception("PlayerInventory is null.");
 
             _slots = new InventorySlotUI[_inventory.MaxSlots];
@@ -42,7 +56,20 @@ namespace UI
             }
  
             _inventory.items.Callback += OnInventoryChanged;
+            _inventory.OnSelectedSlotChanged += OnSelectedSlotChanged;
             RefreshAll();
+        }
+
+        private void OnSelectedSlotChanged(int obj, InventoryItem item)
+        { 
+            for (var i = 0; i < _slots.Length; i++)
+            {
+                if (i == obj)
+                    _slots[i].Highlight();
+                else
+                    _slots[i].Unhighlight();
+            }
+            
         }
 
         private void OnDestroy()

@@ -22,6 +22,8 @@ namespace InventorySystem.Base
         public bool IsStackable => !IsRooster;    // roosters are unique/non-stackable
         public bool IsEmpty     => string.IsNullOrEmpty(_itemId) && !HasRooster;
 
+        public static InventoryItem Empty => default;
+
         // Primary constructor
         public InventoryItem(string itemId, ItemType type, int quantity = 1, Rooster rooster = null)
         {

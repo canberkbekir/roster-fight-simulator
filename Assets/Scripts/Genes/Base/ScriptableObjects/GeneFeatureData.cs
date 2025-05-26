@@ -9,9 +9,10 @@ namespace Genes.Base.ScriptableObjects
         Stat
     }
     public abstract class GeneFeatureData : ScriptableObject,IGeneFeature
-    {
-        public GeneFeatureType GeneFeatureType;
+    { 
         public abstract GeneFeature CreateFeature();
+        public GeneFeatureType GeneFeatureType { get; set; }
+        public string Name { get; set; }
     }
 
    
