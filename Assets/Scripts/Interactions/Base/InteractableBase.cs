@@ -3,8 +3,7 @@ using UnityEngine;
 using Mirror;
 
 namespace Interactions.Base
-{
-    [RequireComponent(typeof(NetworkIdentity))]
+{ 
     public class InteractableBase : NetworkBehaviour, IInteractable
     {
         [SerializeField] private string interactionPrompt = "Press E to interact";
