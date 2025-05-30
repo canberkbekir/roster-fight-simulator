@@ -16,6 +16,7 @@ namespace Roosters.Components
         [SerializeField] private RoosterEquipment _equipment;
         [SerializeField] private RoosterAppearance _appearance;
         [SerializeField] private string _name;
+        [SerializeField] private RoosterGender _gender;
 
         public RoosterStats Stats { get; private set; }
         public RoosterGenome Genome { get; private set; }
@@ -24,7 +25,8 @@ namespace Roosters.Components
         public RoosterAppearance Appearance { get; private set; } 
         public RoosterEventBus EventBus { get; private set; }
         public string RoosterName => _name;
-        public Rooster Rooster { get;  set; }
+        public Rooster Rooster { get;  set; } 
+        public RoosterGender Gender { get; private set; }
 
         
         private bool _isInitialized;

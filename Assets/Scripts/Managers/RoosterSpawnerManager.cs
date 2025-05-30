@@ -15,46 +15,62 @@ namespace Managers
     public class RoosterSpawnerManager : NetworkBehaviour
     {
         #region Inspector Fields
+
         [SerializeField] private GeneDataContainer geneDataContainer;
-        [SerializeField] private GameObject        roosterEntityPrefab;
+        [SerializeField] private GameObject roosterEntityPrefab;
+
         #endregion
 
         #region Public Requests
+
         public void RequestSpawnRandomRoosterAt(Transform spawnPoint)
         {
             if (!isClient) return;
             CmdSpawnRandomRooster(spawnPoint.position, spawnPoint.rotation);
         }
 
-        public void RequestSpawnRoosterAt(Vector3 spawnPos, Rooster rooster,Quaternion? spawnRot = null)
+        public void RequestSpawnRoosterAt(Vector3 spawnPos, Rooster rooster, Quaternion? spawnRot = null)
         {
             if (!isClient) return;
-            var rot = spawnRot ?? Quaternion.identity; 
+            var rot = spawnRot ?? Quaternion.identity;
+
+            var geneSyncs = rooster.Genes.Select(g => new GeneSync(g)).ToArray(); 
             
-            var geneSyncs = rooster.Genes.Select(g => new GeneSync(g)).ToArray();
-            
-            CmdSpawnRooster(spawnPos, rooster,geneSyncs, rot);
+            //Assign a random gender to the rooster
+            rooster.Gender =  (RoosterGender)UnityEngine.Random.Range(0, Enum.GetValues(typeof(RoosterGender)).Length); 
+            CmdSpawnRooster(spawnPos, rooster, geneSyncs, rot);
         }
+
+        public void RequestSpawnRoosterWithParentAt(
+            Vector3 spawnPos, Rooster rooster, NetworkIdentity parentIdentity, Quaternion? spawnRot = null)
+        {
+            if (!isClient) return;
+            var rot = spawnRot ?? Quaternion.identity;
+            var geneSyncs = rooster.Genes.Select(g => new GeneSync(g)).ToArray();
+            CmdSpawnRooster(spawnPos, rooster, geneSyncs, rot,parentIdentity.netId);
+        }
+
         #endregion
 
         #region Commands
+
         [Command(requiresAuthority = false)]
         private void CmdSpawnRandomRooster(Vector3 spawnPos, Quaternion spawnRot)
         {
-            var gene   = geneDataContainer.GetRandomGene();
+            var gene = geneDataContainer.GetRandomGene();
             var entity = CreateRoosterEntity(gene);
             SpawnRoosterInternal(entity, spawnPos, spawnRot);
         }
 
         [Command(requiresAuthority = false)]
-        private void CmdSpawnRooster(Vector3 spawnPos,Rooster rooster,GeneSync[] geneSyncs,Quaternion spawnRot)
+        private void CmdSpawnRooster(Vector3 spawnPos, Rooster rooster, GeneSync[] geneSyncs, Quaternion spawnRot)
         {
             if (rooster == null)
             {
                 Debug.LogError("Rooster is null.");
                 return;
             }
- 
+
             var validGenes = new List<Gene>(geneSyncs.Length);
             foreach (var sync in geneSyncs)
             {
@@ -69,14 +85,49 @@ namespace Managers
                 gene.OverridePassingChance(sync.currentPassingChance);
                 validGenes.Add(gene);
             }
+
             rooster.Genes = validGenes.ToArray();
- 
+
             var entity = CreateRoosterEntity(rooster);
             SpawnRoosterInternal(entity, spawnPos, spawnRot);
         }
+
+        [Command(requiresAuthority = false)]
+        private void CmdSpawnRooster(Vector3 spawnPos, Rooster rooster, GeneSync[] geneSyncs, Quaternion spawnRot, uint parentNetId)
+        {
+            if (rooster == null)
+            {
+                Debug.LogError("Rooster is null.");
+                return;
+            }
+
+            var validGenes = new List<Gene>(geneSyncs.Length);
+            foreach (var sync in geneSyncs)
+            {
+                var data = geneDataContainer.GetGeneById(sync.id);
+                if (data == null)
+                {
+                    Debug.LogError($"Gene with ID {sync.id} not found.");
+                    continue;
+                }
+
+                var gene = new Gene(data);
+                gene.OverridePassingChance(sync.currentPassingChance);
+                validGenes.Add(gene);
+            }
+
+            rooster.Genes = validGenes.ToArray();
+
+            var entity = CreateRoosterEntity(rooster);
+            if (NetworkServer.spawned.TryGetValue(parentNetId, out var parentObj))
+                entity.transform.SetParent(parentObj.transform);
+            SpawnRoosterInternal(entity, spawnPos, spawnRot);
+        }
+
         #endregion
 
         #region Helpers
+
         private void SpawnRoosterInternal(RoosterEntity entity, Vector3 pos, Quaternion rot)
         {
             entity.transform.SetPositionAndRotation(pos, rot);
@@ -88,18 +139,22 @@ namespace Managers
 
             NetworkServer.Spawn(entity.gameObject, connectionToClient);
         }
+
         #endregion
 
         #region Entity Creation
+
         private RoosterEntity CreateRoosterEntity(GeneData geneData)
         {
             if (roosterEntityPrefab == null)
-                throw new UnassignedReferenceException("roosterEntityPrefab must be assigned in RoosterSpawnerManager.");
+                throw new UnassignedReferenceException(
+                    "roosterEntityPrefab must be assigned in RoosterSpawnerManager.");
 
-            var go  = Instantiate(roosterEntityPrefab);
+            var go = Instantiate(roosterEntityPrefab);
             var ent = go.GetComponent<RoosterEntity>();
             if (ent == null)
-                throw new MissingComponentException($"RoosterEntity component missing on prefab '{roosterEntityPrefab.name}'.");
+                throw new MissingComponentException(
+                    $"RoosterEntity component missing on prefab '{roosterEntityPrefab.name}'.");
 
             var rooster = new Rooster { Genes = new[] { new Gene(geneData) } };
             ent.Init(rooster);
@@ -109,26 +164,29 @@ namespace Managers
         private RoosterEntity CreateRoosterEntity(Rooster rooster)
         {
             if (roosterEntityPrefab == null)
-                throw new UnassignedReferenceException("roosterEntityPrefab must be assigned in RoosterSpawnerManager.");
-            
+                throw new UnassignedReferenceException(
+                    "roosterEntityPrefab must be assigned in RoosterSpawnerManager.");
+
             if (rooster == null)
                 throw new ArgumentNullException(nameof(rooster), "Rooster cannot be null.");
 
             rooster.Genes = rooster.Genes.Select(g =>
-                {
-                    var data = geneDataContainer.GetGeneById(g.GeneId)
-                               ?? throw new ArgumentException($"Gene ID {g.GeneId} not found.");
-                    return new Gene(data);
-                }).ToArray();
+            {
+                var data = geneDataContainer.GetGeneById(g.GeneId)
+                           ?? throw new ArgumentException($"Gene ID {g.GeneId} not found.");
+                return new Gene(data);
+            }).ToArray();
 
-            var go  = Instantiate(roosterEntityPrefab);
+            var go = Instantiate(roosterEntityPrefab);
             var ent = go.GetComponent<RoosterEntity>();
             if (ent == null)
-                throw new MissingComponentException($"RoosterEntity component missing on prefab '{roosterEntityPrefab.name}'.");
+                throw new MissingComponentException(
+                    $"RoosterEntity component missing on prefab '{roosterEntityPrefab.name}'.");
 
             ent.Init(rooster);
             return ent;
         }
+
         #endregion
     }
 }

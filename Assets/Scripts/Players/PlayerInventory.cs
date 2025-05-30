@@ -26,6 +26,9 @@ namespace Players
 
         public int MaxSlots => maxSlots;
         public int SelectedSlot { get; private set; } = 0;
+        
+        public InventoryItem SelectedItem => 
+            SelectedSlot >= 0 && SelectedSlot < items.Count ? items[SelectedSlot] : InventoryItem.Empty;
 
         #region Events
         public event Action<InventoryItem> OnItemDropped;
@@ -91,6 +94,11 @@ namespace Players
             SelectedSlot = index;
             OnSelectedSlotChanged?.Invoke(SelectedSlot, items[SelectedSlot]);
         }
+        public InventoryItem GetItemAt(int index)
+        {
+            if (index < 0 || index >= items.Count) return InventoryItem.Empty;
+            return items[index];
+        }  
 
         [Server]
         public void AddItem(string itemId, int qty, Rooster rooster)
