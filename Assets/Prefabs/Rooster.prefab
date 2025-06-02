@@ -293,7 +293,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3555309984279313475}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -302,7 +302,7 @@ Transform:
   - {fileID: 8133369150544714017}
   - {fileID: 3749508669699163999}
   m_Father: {fileID: 9089817972910106211}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &4155414721751905445
 GameObject:
   m_ObjectHideFlags: 0
@@ -1192,6 +1192,8 @@ GameObject:
   - component: {fileID: 2142081051507048970}
   - component: {fileID: 5474402831220189575}
   - component: {fileID: 3575680096342574043}
+  - component: {fileID: 6740957189236644145}
+  - component: {fileID: -7522235662713548044}
   m_Layer: 7
   m_Name: Rooster
   m_TagString: Untagged
@@ -1355,6 +1357,53 @@ MonoBehaviour:
   syncInterval: 0
   interactionPrompt: Press E to interact
   itemId: 
+--- !u!195 &6740957189236644145
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8275249107842052983}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.2
+  m_Speed: 2
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 0.2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &-7522235662713548044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8275249107842052983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3262c8fd33334912b672701fa98c3feb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  tickInterval: 1
+  wanderRadius: 5
+  wanderColor: {r: 1, g: 1, b: 1, a: 1}
+  mateSearchRadius: 10
+  mateSearchColor: {r: 1, g: 0, b: 0, a: 1}
+  breedingDistance: 1
+  breedingDistanceColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  chickenLayer:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!1 &8281196761010271120
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-using Genes.Base.ScriptableObjects;
+using Creatures.Genes.Base.ScriptableObjects;
 using InventorySystem.Base;
 using UnityEngine;
 

@@ -1,6 +1,5 @@
 // UI/InventorySlotUI.cs
 
-using Roosters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

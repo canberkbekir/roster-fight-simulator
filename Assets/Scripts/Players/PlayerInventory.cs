@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Creatures.Roosters;
 using InventorySystem.Base;
 using Managers;
 using Mirror;
-using Roosters;
 using UnityEngine;
 
 namespace Players

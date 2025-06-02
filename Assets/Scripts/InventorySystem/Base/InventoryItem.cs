@@ -1,5 +1,5 @@
 ﻿using System;
-using Roosters;
+using Creatures.Roosters;
 using UnityEngine;
 
 namespace InventorySystem.Base

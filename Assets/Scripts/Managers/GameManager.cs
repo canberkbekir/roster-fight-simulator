@@ -10,8 +10,12 @@ namespace Managers
         [Header("Managers")]
         [SerializeField] private RoosterSpawnerManager roosterSpawnerManager;
         [SerializeField] private ContainerManager containerManager;
+        [SerializeField] private EggManager eggManager;
+        [SerializeField] private BreedingManager breedingManager;
         public RoosterSpawnerManager RoosterSpawnerManager => roosterSpawnerManager;
         public ContainerManager ContainerManager => containerManager;
+        public EggManager EggManager => eggManager;
+        public BreedingManager BreedingManager => breedingManager;
         void Awake()
         {
             if (Instance != null && Instance != this)

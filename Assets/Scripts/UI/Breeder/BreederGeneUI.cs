@@ -1,4 +1,4 @@
-﻿using Genes.Base;
+﻿using Creatures.Genes.Base;
 using UnityEngine;
 
 namespace UI.Breeder

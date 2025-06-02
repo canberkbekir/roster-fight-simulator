@@ -1,10 +1,12 @@
+using Creatures.Roosters;
 using UnityEngine;
 using Mirror;
 using Interactions.Base;
 using Managers;
 using Players;
-using Roosters; // for GameManager
-using Roosters.Components; // for RoosterState
+// for GameManager
+
+// for RoosterState
 
 namespace InventorySystem.Base
 {

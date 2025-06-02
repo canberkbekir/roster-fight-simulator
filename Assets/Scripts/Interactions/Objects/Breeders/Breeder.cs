@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using Creatures.Roosters;
+using Creatures.Roosters.Components;
 using Interactions.Base;
 using InventorySystem.Base;
 using Managers;
 using Mirror;
 using Players;
-using Roosters;
-using Roosters.Components;
 using UI;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -100,12 +100,12 @@ namespace Interactions.Objects.Breeders
                 return;
             }
  
-            _roosterSpawnerManager.RequestSpawnRoosterWithParentAt(
-                GetRandomSpawnPoint(),
-                rooster,
-                parentIdentity,
-                Quaternion.identity
-            );
+            // _roosterSpawnerManager.RequestSpawnRoosterWithParentAt(
+            //     GetRandomSpawnPoint(),
+            //     rooster,
+            //     parentIdentity,
+            //     Quaternion.identity
+            // );
         }
         
         private Vector3 GetRandomSpawnPoint()

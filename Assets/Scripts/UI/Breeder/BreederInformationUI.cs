@@ -1,4 +1,4 @@
-using Roosters;
+using Creatures.Roosters;
 using UnityEngine;
 using UnityEngine.UI;
 
