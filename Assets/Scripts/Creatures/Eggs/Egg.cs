@@ -1,5 +1,5 @@
-// Egg.cs
 using System.Collections.Generic;
+using System;
 using Creatures.Genes;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
@@ -9,6 +9,7 @@ using Managers;
 using Mirror;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 namespace Creatures.Eggs
 {
@@ -28,13 +29,17 @@ namespace Creatures.Eggs
         private bool _hasHatched;
         private GeneDataContainer _geneDataContainer;
 
+        /// <summary>
+        /// Yumurtanın kuluçka süresi dolduğunda abone olanları bilgilendirecek event.
+        /// </summary>
+        public event Action<Egg> OnHatched;  // <<< **YENİ** event bildirimi
+
         public override void OnStartServer()
         {
             base.OnStartServer();
             _hatchTimer = hatchTime;
             _hasHatched = false;
             isIncubating = false;
- 
             _geneDataContainer = GameManager.Instance.ContainerManager.GeneDataContainer;
         }
 
@@ -42,13 +47,39 @@ namespace Creatures.Eggs
         private void Update()
         {
             if (_hasHatched) return;
- 
             if (!isIncubating) return;
 
             _hatchTimer -= Time.deltaTime;
-            if (!(_hatchTimer <= 0f)) return;
-            _hasHatched = true;
-            HatchEgg();
+            if (_hatchTimer <= 0f)
+            {
+                _hasHatched = true; 
+                OnHatched?.Invoke(this); 
+                HatchEgg();
+            }
+        }
+
+        /// <summary>
+        /// Kuluçkayı sunucu tarafında başlatmak için helper.
+        /// Hem SyncVar isIncubating=true set eder, hem RPC ile istemcilerde VFX oynatmayı tetikler.
+        /// </summary>
+        [Server]
+        public void StartIncubation()
+        {
+            if (isIncubating) return;
+            isIncubating = true;
+            // İstemcilerde görsel bir efekt çalıştırmak isterseniz:
+            RpcPlayIncubationVFX();
+        }
+
+        /// <summary>
+        /// İstemci tarafında, incubate başladığında VFX ya da animasyon oynatmak isterseniz burayı kullanabilirsiniz.
+        /// </summary>
+        [ClientRpc]
+        private void RpcPlayIncubationVFX()
+        {
+            // Örneğin: 
+            // Instantiate(incubationVfxPrefab, transform.position, Quaternion.identity);
+            // Veya bir animatör trigger’ı tetikleyebilirsiniz.
         }
 
         [Server]

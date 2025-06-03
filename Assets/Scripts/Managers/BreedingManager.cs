@@ -28,12 +28,8 @@ namespace Managers
             Instance = this;
             _geneDataContainer = GameManager.Instance.ContainerManager.GeneDataContainer;
             _eggManager = GameManager.Instance.EggManager;
-        }
-
-        /// <summary>
-        /// Called by client‐side code to request that two networked roosters breed.
-        /// Issues a [Command] to the server with each parent's netId + spawn location.
-        /// </summary>
+        } 
+        
         public void RequestBreed(RoosterEntity mother, RoosterEntity father, Nest nest)
         {
             if (!isClient) return;

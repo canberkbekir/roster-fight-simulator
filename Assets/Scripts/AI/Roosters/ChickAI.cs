@@ -5,17 +5,15 @@ using UnityEngine.AI;
 
 namespace AI.Roosters
 {
-    /// <summary>
-    /// Simple FSM for a chick: wander around forever (no breeding or nests).
-    /// </summary>
+    public enum ChickState
+    {
+        Idle,
+        Wander
+    }
+    
     [RequireComponent(typeof(RoosterEntity))]
     public class ChickAI : BaseAI
-    {
-        private enum ChickState
-        {
-            Idle,
-            Wander
-        }
+    { 
 
         [Header("Chick AI Settings")]
         [SerializeField] private float wanderRadius = 2f;
@@ -27,6 +25,7 @@ namespace AI.Roosters
         private float _wanderTimer = 0f;
         private const float WanderInterval = 2f;
 
+        public ChickState CurrentState => _currentState;
         private void Start()
         {
             if (!isServer) return;

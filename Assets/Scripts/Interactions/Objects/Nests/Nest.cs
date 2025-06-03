@@ -1,3 +1,4 @@
+using System;
 using Creatures.Eggs;
 using Creatures.Roosters.Components;
 using Mirror;
@@ -23,9 +24,17 @@ namespace Interactions.Objects.Nests
         public Transform SpawnTransform => spawnTransform;
         public RoosterEntity CurrentChicken => _currentChicken;
         public Egg CurrentEgg => _currentEgg; 
+        public bool IsOccupied => _occupiedChickenNetId != 0 || _occupiedEggNetId != 0;
+
+        /// <summary>
+        /// Yumurtanın kuluçka süresi dolup hatch olduğunda
+        /// diğer sistemlerin (örn. ChickenAI) da haberdar olması için.
+        /// </summary>
+        public event Action<Nest> OnEggHatched;  // <<< **YENİ**
 
         /// <summary>
         /// Server-only: assign both chicken and egg to this nest.
+        /// (Yalnızca tavuğu atmak için kullanılıyordu; şimdi egg atma da ekleniyor.)
         /// </summary>
         [Server]
         public void Assign(uint chickenNetId)
@@ -42,57 +51,110 @@ namespace Interactions.Objects.Nests
                 return;
             }
 
-           
             if (!NetworkServer.spawned.TryGetValue(chickenNetId, out var chObj))
             {
                 Debug.LogError($"[Nest:{name}] Assign failed: chicken not found for netId={chickenNetId}");
                 return;
             }
             var chickenEnt = chObj.GetComponent<RoosterEntity>();
-            if (chickenEnt == null)
+            if (!chickenEnt)
             {
                 Debug.LogError($"[Nest:{name}] Assign failed: object {chickenNetId} has no RoosterEntity");
                 return;
             }
 
             _occupiedChickenNetId = chickenNetId;
-
             _currentChicken = chickenEnt;
-
-            chickenEnt.AssignNest(netId);
+            chickenEnt.Reproduction.AssignNest(netId);
         }
 
         /// <summary>
-        /// Server-only: remove the egg (e.g. after hatching).
-        /// Clears egg reference and notifies the chicken to clear its nest.
+        /// Server-only: assign edilmiş bir egg objesini bu yuva üzerine yerleştirir.
         /// </summary>
         [Server]
-        public void RemoveEgg()
+        public void AssignEgg(uint eggNetId)
         {
-            if (_occupiedEggNetId == 0)
+            if (eggNetId == 0)
+            {
+                Debug.LogError($"[Nest:{name}] AssignEgg failed: invalid eggNetId=0");
                 return;
+            }
 
+            if (_occupiedEggNetId != 0)
+            {
+                Debug.LogError($"[Nest:{name}] AssignEgg failed: nest already has egg {_occupiedEggNetId}");
+                return;
+            }
+
+            if (!NetworkServer.spawned.TryGetValue(eggNetId, out var eggObj))
+            {
+                Debug.LogError($"[Nest:{name}] AssignEgg failed: egg not found for netId={eggNetId}");
+                return;
+            }
+            var eggComp = eggObj.GetComponent<Egg>();
+            if (!eggComp)
+            {
+                Debug.LogError($"[Nest:{name}] AssignEgg failed: object {eggNetId} has no Egg component");
+                return;
+            }
+
+            _occupiedEggNetId = eggNetId;
+            _currentEgg = eggComp;
+
+            // Yuvaya yumurta konumu:
+            eggObj.transform.position = spawnTransform.position;
+
+            // Yumurtanın OnHatched event'ine abone ol
+            eggComp.OnHatched += HandleEggHatched;  // <<< **YENİ**
+        }
+
+        /// <summary>
+        /// Server-only: kuluçka süresi biten bir Egg, OnHatched.Invoke() ile burayı tetikler.
+        /// Önce Nest iç durumunu temizler, sonra tavuğa ClearNest() der, 
+        /// en son kendi event’ini (OnEggHatched) ateşler.
+        /// </summary>
+        [Server]
+        private void HandleEggHatched(Egg egg)
+        {
+            // 1) Aboneliği kaldır:
+            if (_currentEgg != null)
+            {
+                _currentEgg.OnHatched -= HandleEggHatched;
+            }
+
+            // 2) Nest’in iç durumu sıfırlansın:
             _occupiedEggNetId = 0;
-            _currentEgg       = null;
+            _currentEgg = null;
 
+            // 3) Tavuğa yuvasından çık dedi (ClearNest)
             if (_occupiedChickenNetId != 0 &&
                 NetworkServer.spawned.TryGetValue(_occupiedChickenNetId, out var chObj))
             {
                 var chickenEnt = chObj.GetComponent<RoosterEntity>();
-                chickenEnt?.ClearNest();
+                chickenEnt?.Reproduction.ClearNest();
             }
+
+            // 4) Dileyen başka sistemler (örn. ChickenAI) dinlesin diye kendi event’imizi ateşle:
+            OnEggHatched?.Invoke(this);
         }
 
         /// <summary>
-        /// Server-only: clear both chicken and egg from the nest (e.g., if chicken leaves).
+        /// Server-only: tavuk yuvasından çekilmek istendiğinde (örn. chicken leaves)
+        /// hayvan ve egg referanslarını tamamen temizler.
         /// </summary>
         [Server]
         public void ClearNest()
         {
-            _occupiedEggNetId     = 0;
+            // Eğer hâlâ bir yumurta varsa aboneliği kaldır:
+            if (_currentEgg != null)
+            {
+                _currentEgg.OnHatched -= HandleEggHatched;
+            }
+
+            _occupiedEggNetId = 0;
             _occupiedChickenNetId = 0;
-            _currentEgg           = null;
-            _currentChicken       = null;
+            _currentEgg = null;
+            _currentChicken = null;
         }
 
         #region Gizmo Visualization

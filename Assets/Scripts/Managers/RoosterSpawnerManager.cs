@@ -18,7 +18,7 @@ namespace Managers
         [SerializeField] private GeneDataContainer geneDataContainer;
         [SerializeField] private GameObject roosterEntityPrefab;
         [SerializeField] private GameObject chickenEntityPrefab;
-        [SerializeField] private GameObject chickEntityPrefab; 
+        [SerializeField] private GameObject chickEntityPrefab;
 
         #endregion 
 
@@ -69,7 +69,7 @@ namespace Managers
 
             var geneSyncs = chickData.Genes.Select(g => new GeneSync(g)).ToArray();
             CmdSpawnChick(spawnPos, chickData, geneSyncs, rot);
-        } 
+        }
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace Managers
 
         [Command(requiresAuthority = false)]
         private void CmdSpawnRandomCreature(Vector3 spawnPos, Quaternion spawnRot, CreatureType type)
-        { 
+        {
             var randomGene = geneDataContainer.GetRandomGene();
             var ro = new Rooster
             {
@@ -110,7 +110,7 @@ namespace Managers
                         var entity = CreateChickEntity(ro);
                         SpawnEntityInternal(entity, spawnPos, spawnRot);
                     }
-                    break; 
+                    break;
             }
         }
 
@@ -200,20 +200,20 @@ namespace Managers
                 validGenes.Add(gene);
             }
 
-            chickData.Genes = validGenes.ToArray(); 
+            chickData.Genes = validGenes.ToArray();
 
             var entity = CreateChickEntity(chickData);
             SpawnEntityInternal(entity, spawnPos, spawnRot);
-        } 
-         
+        }
+
         #endregion
 
         #region Helpers
- 
+
         private void SpawnEntityInternal(RoosterEntity entity, Vector3 pos, Quaternion rot)
         {
             entity.transform.SetPositionAndRotation(pos, rot);
- 
+
             if (entity.TryGetComponent(out InventorySystem.Base.ItemWorld itemWorld))
                 itemWorld.SetRooster(entity.Rooster);
 
@@ -308,7 +308,7 @@ namespace Managers
 
         private RoosterEntity CreateChickEntity(Rooster chickData)
         {
-            if (chickEntityPrefab == null)
+            if (!chickEntityPrefab)
                 throw new UnassignedReferenceException("chickEntityPrefab must be assigned.");
 
             if (chickData == null)

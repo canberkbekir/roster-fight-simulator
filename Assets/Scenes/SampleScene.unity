@@ -1488,8 +1488,8 @@ MonoBehaviour:
   syncInterval: 0
   roosterSpawnerManager: {fileID: 332672869}
   containerManager: {fileID: 1427118041}
-  eggManager: {fileID: 0}
-  breedingManager: {fileID: 0}
+  eggManager: {fileID: 1225883037}
+  breedingManager: {fileID: 1681769916}
 --- !u!4 &630292035
 Transform:
   m_ObjectHideFlags: 0
@@ -4797,6 +4797,14 @@ PrefabInstance:
     - target: {fileID: 6250778752803995524, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
       propertyPath: m_Name
       value: Nest
+      objectReference: {fileID: 0}
+    - target: {fileID: 6264043361301983738, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8115206106519389503, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
