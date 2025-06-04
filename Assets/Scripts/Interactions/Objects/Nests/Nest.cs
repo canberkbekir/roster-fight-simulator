@@ -100,52 +100,36 @@ namespace Interactions.Objects.Nests
 
             _occupiedEggNetId = eggNetId;
             _currentEgg = eggComp;
-
-            // Yuvaya yumurta konumu:
-            eggObj.transform.position = spawnTransform.position;
-
-            // Yumurtanın OnHatched event'ine abone ol
-            eggComp.OnHatched += HandleEggHatched;  // <<< **YENİ**
+ 
+            eggObj.transform.position = spawnTransform.position; 
+            eggComp.OnHatched += HandleEggHatched;  
         }
-
-        /// <summary>
-        /// Server-only: kuluçka süresi biten bir Egg, OnHatched.Invoke() ile burayı tetikler.
-        /// Önce Nest iç durumunu temizler, sonra tavuğa ClearNest() der, 
-        /// en son kendi event’ini (OnEggHatched) ateşler.
-        /// </summary>
+ 
         [Server]
         private void HandleEggHatched(Egg egg)
-        {
-            // 1) Aboneliği kaldır:
-            if (_currentEgg != null)
+        { 
+            if (_currentEgg)
             {
                 _currentEgg.OnHatched -= HandleEggHatched;
             }
-
-            // 2) Nest’in iç durumu sıfırlansın:
+ 
             _occupiedEggNetId = 0;
             _currentEgg = null;
-
-            // 3) Tavuğa yuvasından çık dedi (ClearNest)
+ 
             if (_occupiedChickenNetId != 0 &&
                 NetworkServer.spawned.TryGetValue(_occupiedChickenNetId, out var chObj))
             {
                 var chickenEnt = chObj.GetComponent<RoosterEntity>();
-                chickenEnt?.Reproduction.ClearNest();
+                chickenEnt?.Reproduction.ClearNestReferences();
             }
-
-            // 4) Dileyen başka sistemler (örn. ChickenAI) dinlesin diye kendi event’imizi ateşle:
+            _occupiedChickenNetId = 0;
+            _currentChicken = null; 
+ 
             OnEggHatched?.Invoke(this);
-        }
-
-        /// <summary>
-        /// Server-only: tavuk yuvasından çekilmek istendiğinde (örn. chicken leaves)
-        /// hayvan ve egg referanslarını tamamen temizler.
-        /// </summary>
+        } 
         [Server]
         public void ClearNest()
-        {
-            // Eğer hâlâ bir yumurta varsa aboneliği kaldır:
+        { 
             if (_currentEgg != null)
             {
                 _currentEgg.OnHatched -= HandleEggHatched;

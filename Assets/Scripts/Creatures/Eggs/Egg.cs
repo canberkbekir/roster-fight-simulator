@@ -28,11 +28,8 @@ namespace Creatures.Eggs
         private float _hatchTimer;
         private bool _hasHatched;
         private GeneDataContainer _geneDataContainer;
-
-        /// <summary>
-        /// Yumurtanın kuluçka süresi dolduğunda abone olanları bilgilendirecek event.
-        /// </summary>
-        public event Action<Egg> OnHatched;  // <<< **YENİ** event bildirimi
+ 
+        public event Action<Egg> OnHatched;   
 
         public override void OnStartServer()
         {
@@ -57,29 +54,21 @@ namespace Creatures.Eggs
                 HatchEgg();
             }
         }
-
-        /// <summary>
-        /// Kuluçkayı sunucu tarafında başlatmak için helper.
-        /// Hem SyncVar isIncubating=true set eder, hem RPC ile istemcilerde VFX oynatmayı tetikler.
-        /// </summary>
+ 
         [Server]
         public void StartIncubation()
         {
             if (isIncubating) return;
-            isIncubating = true;
-            // İstemcilerde görsel bir efekt çalıştırmak isterseniz:
+            isIncubating = true; 
             RpcPlayIncubationVFX();
         }
 
         /// <summary>
-        /// İstemci tarafında, incubate başladığında VFX ya da animasyon oynatmak isterseniz burayı kullanabilirsiniz.
+        /// Plays the incubation visual effects on all clients.
         /// </summary>
         [ClientRpc]
         private void RpcPlayIncubationVFX()
-        {
-            // Örneğin: 
-            // Instantiate(incubationVfxPrefab, transform.position, Quaternion.identity);
-            // Veya bir animatör trigger’ı tetikleyebilirsiniz.
+        { 
         }
 
         [Server]
@@ -99,8 +88,7 @@ namespace Creatures.Eggs
                 Destroy(chickObject);
                 return;
             }
-
-            // Build the new Rooster data from synced genes
+ 
             var babyData = new Rooster
             {
                 Gender = (Random.value < 0.5f) ? RoosterGender.Male : RoosterGender.Female,

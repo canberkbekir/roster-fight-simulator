@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Creatures.Eggs;
 using Creatures.Genes;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
@@ -9,13 +10,13 @@ using Mirror;
 using UnityEngine;
 
 namespace Managers
-{ 
+{
     public class BreedingManager : NetworkBehaviour
-    {  
+    {
         public static BreedingManager Instance { get; private set; }
 
         private GeneDataContainer _geneDataContainer;
-        private EggManager _eggManager;
+        private EggManager       _eggManager;
 
         private void Awake()
         {
@@ -24,70 +25,50 @@ namespace Managers
                 Destroy(gameObject);
                 return;
             }
-
             Instance = this;
+
             _geneDataContainer = GameManager.Instance.ContainerManager.GeneDataContainer;
-            _eggManager = GameManager.Instance.EggManager;
-        } 
-        
-        public void RequestBreed(RoosterEntity mother, RoosterEntity father, Nest nest)
-        {
-            if (!isClient) return;
-
-            if (mother == null || father == null)
-            {
-                Debug.LogError("BreedingManager: A null parent was passed into RequestBreed.");
-                return;
-            }
- 
-            CmdBreedOnServer(mother.netId, father.netId, nest.netId);
+            _eggManager        = GameManager.Instance.EggManager;
         }
-
-        [Command(requiresAuthority = false)]
-        private void CmdBreedOnServer(uint motherNetId, uint fatherNetId, uint nestNetId)
-        { 
-            if (!NetworkServer.spawned.TryGetValue(motherNetId, out var momObj) ||
-                !NetworkServer.spawned.TryGetValue(fatherNetId, out var dadObj))
+ 
+        [Server]
+        public Egg SpawnEggAndAssignToNest(RoosterEntity mother, RoosterEntity father, Nest nest)
+        {
+            if (mother == null || father == null || nest == null)
             {
-                Debug.LogError($"BreedingManager: Could not find parent netIds {motherNetId} or {fatherNetId} on the server.");
-                return;
-            }
-            
-            if (!NetworkServer.spawned.TryGetValue(nestNetId, out var nestObj))
-            {
-                Debug.LogError($"BreedingManager: Could not find nest netId {nestNetId} on the server.");
-                return;
-            }
-
-            var motherEntity = momObj.GetComponent<RoosterEntity>();
-            var fatherEntity = dadObj.GetComponent<RoosterEntity>();
-            var nestObject = nestObj.GetComponent<Nest>();
-            
-            if (!motherEntity || fatherEntity == null)
-            {
-                Debug.LogError("BreedingManager: One of the netIds is not a RoosterEntity.");
-                return;
+                Debug.LogError("[BreedingManager] SpawnEggAndAssignToNest: one argument was null.");
+                return null;
             }
  
-            var mixed = CrossGenes(motherEntity.Rooster.Genes, fatherEntity.Rooster.Genes);
+            var mixed = CrossGenes(
+                mother.Rooster.Genes,
+                father.Rooster.Genes
+            );
  
-            if (!_eggManager)
+            var newEggNetId = _eggManager.SpawnEggWithGenes(nest, mixed);
+            if (newEggNetId == 0)
             {
-                Debug.LogError("BreedingManager: eggManager reference not set in inspector.");
-                return;
+                Debug.LogError("[BreedingManager] Failed to spawn egg via EggManager.");
+                return null;
             }
-
-            _eggManager.SpawnEggWithGenes(nestObject.SpawnTransform.position, mixed);
-        } 
+ 
+            var spawnedEgg = nest.CurrentEgg;
+            if (spawnedEgg == null)
+            {
+                Debug.LogError("[BreedingManager] After spawning, nest.CurrentEgg is still null!");
+            }
+            return spawnedEgg;
+        }
+ 
         public static GeneSync[] CrossGenes(Gene[] momGenes, Gene[] dadGenes)
         {
             var lookup = new Dictionary<int, Gene>();
- 
+
             foreach (var gm in momGenes)
             {
                 lookup[gm.GeneId] = gm;
             }
- 
+
             foreach (var gf in dadGenes)
             {
                 if (!lookup.ContainsKey(gf.GeneId))
@@ -96,11 +77,10 @@ namespace Managers
                 }
                 else
                 {
-                    
                     var chosen = (Random.value < 0.5f) ? lookup[gf.GeneId] : gf;
                     lookup[gf.GeneId] = chosen;
                 }
-            } 
+            }
 
             return lookup.Select(kvp => new GeneSync(kvp.Value)).ToArray();
         }

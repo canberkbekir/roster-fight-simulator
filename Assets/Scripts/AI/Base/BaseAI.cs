@@ -12,7 +12,7 @@ namespace AI.Base
         [FoldoutGroup("AI Settings/Timing"), LabelText("Tick Interval"), Tooltip("Seconds between each AI state update.")]
         [PropertyRange(0.1f, 5f)]
         [SerializeField]
-        private float tickInterval = 1f;
+        private float tickInterval = 0.1f;
 
         [FoldoutGroup("AI Settings/Debug"), Sirenix.OdinInspector.ShowInInspector, Sirenix.OdinInspector.ReadOnly]
         [LabelText("NavMesh Agent"), Tooltip("Cached NavMeshAgent component.")]

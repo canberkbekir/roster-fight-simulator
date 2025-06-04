@@ -16,8 +16,8 @@ namespace Creatures.Roosters.Components
     /// </summary>
     public class RoosterReproduction : NetworkBehaviour, IRoosterComponent
     {
-        [SyncVar] private bool _isPregnant = false;
         [SyncVar] private uint _currentNestNetId = 0;
+        [SyncVar] private uint _pregnantByNetId;
 
         private RoosterEntity _owner;
 
@@ -29,14 +29,49 @@ namespace Creatures.Roosters.Components
             _owner = owner;
         }
 
-        public bool IsPregnant => _isPregnant;
+        [field: SyncVar]
+        public bool IsPregnant { get; private set; } = false;
+
         public Nest CurrentNest
         {
             get
             {
-                if (_currentNestNetId == 0) return null;
+                if (_currentNestNetId == 0)
+                {
+                    Debug.Log($"[RoosterReproduction:{name}] CurrentNest: null (no nest assigned)");
+                    return null;
+                }
+
                 if (NetworkServer.spawned.TryGetValue(_currentNestNetId, out var nestObj))
-                    return nestObj.GetComponent<Nest>();
+                {
+                    var nest = nestObj.GetComponent<Nest>();
+                    Debug.Log($"[RoosterReproduction:{name}] CurrentNest: {nest?.name}");
+                    return nest;
+                }
+
+                Debug.Log($"[RoosterReproduction:{name}] CurrentNest: null (nest not found in spawned objects)");
+                return null;
+            }
+        }
+
+        public RoosterEntity PregnantBy
+        {
+            get
+            {
+                if (_pregnantByNetId == 0)
+                {
+                    Debug.Log($"[RoosterReproduction:{name}] PregnantBy: null (no rooster assigned)");
+                    return null;
+                }
+
+                if (NetworkServer.spawned.TryGetValue(_pregnantByNetId, out var roosterObj))
+                {
+                    var rooster = roosterObj.GetComponent<RoosterEntity>();
+                    Debug.Log($"[RoosterReproduction:{name}] PregnantBy: {rooster?.name}");
+                    return rooster;
+                }
+
+                Debug.Log($"[RoosterReproduction:{name}] PregnantBy: null (rooster not found in spawned objects)");
                 return null;
             }
         }
@@ -46,16 +81,17 @@ namespace Creatures.Roosters.Components
         [Server]
         public void MarkPregnant(uint fatherNetId)
         {
-            if (_isPregnant) return;
-            _isPregnant = true;
-            // Optionally store fatherNetId if you need it elsewhere
+            if (IsPregnant) return;
+            IsPregnant = true; 
+            _pregnantByNetId = fatherNetId;
+            _currentNestNetId = 0;  
         }
 
         [Server]
         public void UnmarkPregnant()
         {
-            if (!_isPregnant) return;
-            _isPregnant = false;
+            if (!IsPregnant) return;
+            IsPregnant = false;
         }
 
         [Server]
@@ -63,11 +99,23 @@ namespace Creatures.Roosters.Components
         {
             _currentNestNetId = nestNetId;
         }
+        
+        [Server]
+        public void UnassignNest()
+        {
+            if (_currentNestNetId == 0)
+            {
+                Debug.LogError($"[RoosterReproduction:{name}] UnassignNest failed: no current nest assigned.");
+                return;
+            }
+
+            _currentNestNetId = 0;
+        }
 
         [Server]
-        public void ClearNest()
+        public void ClearNestReferences()
         {
-            _isPregnant = false;
+            IsPregnant = false;
             _currentNestNetId = 0;
         }
 
@@ -93,21 +141,14 @@ namespace Creatures.Roosters.Components
                 return;
             }
 
-            if (_isPregnant)
-            {
-                Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: already pregnant.");
-                return;
-            }
-
-            // Trigger any sit animation or VFX here
-            Debug.Log($"[RoosterReproduction:{name}] Sitting on egg at nest {nest.name}");
+            if (!IsPregnant) return;
+            Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: already pregnant.");
         }
 
         public override void OnStartServer()
         {
-            base.OnStartServer();
-            // If we still have a nest assigned and aren’t marked pregnant, try to re‐attach
-            if (_currentNestNetId == 0 || _isPregnant) return;
+            base.OnStartServer(); 
+            if (_currentNestNetId == 0 || IsPregnant) return;
             if (!NetworkServer.spawned.TryGetValue(_currentNestNetId, out var nestObj)) return;
             var nest = nestObj.GetComponent<Nest>();
             if (!nest || !nest.CurrentEgg) return;
@@ -118,49 +159,33 @@ namespace Creatures.Roosters.Components
                 SitOnEgg();
         }
 
-        #endregion
-
-        // ********** Aşağıya yeni eklenecek kısım **********
-
-        /// <summary>
-        /// İki tavuk (bu ve partner) bir araya geldiğinde çağrılır. 
-        /// Eğer şartlar uygunsa hem erkek hem dişi tarafın AI state'lerini günceller
-        /// ve dişiyi hamile bırakır. 
-        /// </summary>
+        #endregion 
         [Server]
         public bool TryBreedWith(RoosterReproduction otherRepro)
         {
-            if (otherRepro == null) return false;
-            if (otherRepro == this) return false; // kendisiyle eşlenemez
-
-            // Ensure one is male, the other female
+            if (!otherRepro) return false;
+            if (otherRepro == this) return false;  
+ 
             var selfGender = _owner.Gender;
             var otherGender = otherRepro._owner.Gender;
             if (selfGender == otherGender) return false;
 
             RoosterReproduction maleSide, femaleSide;
-            if (selfGender == RoosterGender.Male && otherGender == RoosterGender.Female)
+            switch (selfGender)
             {
-                maleSide = this;
-                femaleSide = otherRepro;
+                case RoosterGender.Male when otherGender == RoosterGender.Female:
+                    maleSide = this;
+                    femaleSide = otherRepro;
+                    break;
+                case RoosterGender.Female when otherGender == RoosterGender.Male:
+                    maleSide = otherRepro;
+                    femaleSide = this;
+                    break;
+                default:
+                    return false;
             }
-            else if (selfGender == RoosterGender.Female && otherGender == RoosterGender.Male)
-            {
-                maleSide = otherRepro;
-                femaleSide = this;
-            }
-            else
-            {
-                return false;
-            }
-
-            // If female already pregnant, abort
-            if (femaleSide._isPregnant) return false;
-
-            // Optional distance check (RoosterAI likely already did this)
-            float dist = Vector3.Distance(maleSide._owner.transform.position, femaleSide._owner.transform.position);
-            const float breedingDistance = 2f;
-            if (dist > breedingDistance) return false;
+ 
+            if (femaleSide.IsPregnant) return false; 
  
             femaleSide.MarkPregnant(maleSide._owner.netId);
  

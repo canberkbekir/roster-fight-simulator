@@ -133,7 +133,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  hatchTime: 60
+  hatchTime: 5
   chickPrefab: {fileID: 6072749610977367117, guid: 2ca7a4e31bc3437438d422a6f2e9335d, type: 3}
   isIncubating: 0
 --- !u!114 &8273468296998680253

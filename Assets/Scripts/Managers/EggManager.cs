@@ -1,21 +1,20 @@
-﻿using System.Collections.Generic;
-using Creatures.Eggs;
+﻿using Creatures.Eggs;
 using Creatures.Genes;
 using Creatures.Genes.Base;
+using Interactions.Objects.Nests;
 using Mirror;
 using UnityEngine;
 
 namespace Managers
-{ 
+{
     public class EggManager : NetworkBehaviour
     {
         [Header("Egg Settings")]
         [Tooltip("Drag in your Egg prefab here. It must have an `Egg` component on it.")]
-        [SerializeField]
-        private GameObject eggPrefab; 
-        
+        [SerializeField] private GameObject eggPrefab;
+
         public static EggManager Instance { get; private set; }
-        
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -23,41 +22,46 @@ namespace Managers
                 Destroy(gameObject);
                 return;
             }
-
             Instance = this;
-        }
-        
-        public void SpawnEggWithGenes(Vector3 spawnPosition, GeneSync[] geneSyncs)
-        {
-            if (!isServer)
-            {
-                Debug.LogError("EggManager.SpawnEggWithGenes called on client! Must be run on server.");
-                return;
-            }
 
             if (eggPrefab == null)
-            {
                 Debug.LogError("EggManager: eggPrefab is not assigned in the inspector.");
-                return;
-            }
-
-            // 1) Instantiate the egg locally on the server
-            var eggObject = Instantiate(eggPrefab, spawnPosition, Quaternion.identity);
-            var eggComponent = eggObject.GetComponent<Egg>();
-            if (eggComponent == null)
+        } 
+        [Server]
+        public uint SpawnEggWithGenes(Nest nest, GeneSync[] geneSyncs)
+        {
+            if (!nest)
             {
-                Debug.LogError("EggManager: The eggPrefab has no Egg component attached.");
+                Debug.LogError("[EggManager] SpawnEggWithGenes: nest is null!");
+                return 0;
+            }
+  
+            var pos = nest.SpawnTransform.position;
+            var eggObject = Instantiate(eggPrefab, pos, Quaternion.identity);
+            var eggComponent = eggObject.GetComponent<Egg>();
+            if (!eggComponent)
+            {
+                Debug.LogError("[EggManager] The eggPrefab has no Egg component attached.");
                 Destroy(eggObject);
-                return;
+                return 0;
             }
  
             eggComponent.Genes.Clear();
             foreach (var gs in geneSyncs)
-            {
                 eggComponent.Genes.Add(gs);
-            } 
-            
+ 
             NetworkServer.Spawn(eggObject);
+ 
+            var nid = eggObject.GetComponent<NetworkIdentity>();
+            if (!nid)
+            {
+                Debug.LogError("[EggManager] Spawned egg has no NetworkIdentity!");
+                return 0;
+            }
+            var newEggNetId = nid.netId;
+ 
+            nest.AssignEgg(newEggNetId); 
+            return newEggNetId;
         }
     }
 }

@@ -149,17 +149,17 @@ namespace AI.Roosters
 
         private void HandleSeekMate()
         {
-            if (_targetChicken != null)
+            if (_targetChicken)
                 MoveTo(_targetChicken.transform.position);
         }
 
         private void HandleBreed()
         {
-            if (_targetChicken != null)
+            if (_targetChicken)
             {
                 var chickenRepro = _targetChicken.Reproduction;
                 var selfRepro = _entity.Reproduction;
-                if (chickenRepro != null && selfRepro != null)
+                if (chickenRepro && selfRepro)
                 {
                     selfRepro.TryBreedWith(chickenRepro);
                 }
@@ -173,10 +173,9 @@ namespace AI.Roosters
         #region State Transitions
 
         private void TryFindMate()
-        {
-            // Use OverlapSphereNonAlloc to avoid garbage
-            int count = Physics.OverlapSphereNonAlloc(transform.position, mateSearchRadius, _chickenOverlapBuffer);
-            for (int i = 0; i < count; i++)
+        { 
+            var count = Physics.OverlapSphereNonAlloc(transform.position, mateSearchRadius, _chickenOverlapBuffer);
+            for (var i = 0; i < count; i++)
             {
                 var col = _chickenOverlapBuffer[i];
                 if (!chickenLayer.Contains(col.gameObject.layer))
@@ -189,6 +188,10 @@ namespace AI.Roosters
                 var chickenRepro = chickenEnt.Reproduction;
                 if (!chickenRepro || chickenRepro.IsPregnant)
                     continue;
+                
+                var chickenAI = chickenEnt.GetComponent<ChickenAI>();
+                if (!chickenAI || chickenAI.CurrentState != ChickenState.Wander)
+                    continue; 
 
                 _targetChicken = chickenEnt;
                 _currentState = RoosterState.SeekMate;

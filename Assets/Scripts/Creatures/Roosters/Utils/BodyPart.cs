@@ -92,8 +92,8 @@ namespace Creatures.Roosters.Utils
             if (partRenderer?.material != null)
                 partRenderer.material.color = c;
 
-            if (bodyPartType == AppearanceGeneType.Body)
-                Debug.Log($"Applying color {c} to {gameObject.name} ({bodyPartType})");
+            // if (bodyPartType == AppearanceGeneType.Body)
+            //     Debug.Log($"Applying color {c} to {gameObject.name} ({bodyPartType})");
         }
     }
 }
