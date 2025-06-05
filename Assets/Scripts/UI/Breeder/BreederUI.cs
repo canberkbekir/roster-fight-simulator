@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
-using Creatures.Roosters;
-using Unity.VisualScripting;
+using Creatures.Chickens.Roosters;  
 using UnityEngine;
 
 namespace UI.Breeder

@@ -53,7 +53,7 @@ namespace UI
 
             if (item.IsRooster)
             {
-                var rooster = item.Rooster;
+                var rooster = item.Chicken;
                 if (rooster == null)
                 {
                     Debug.LogWarning("Selected item is a rooster but Rooster data is null.");
@@ -61,7 +61,7 @@ namespace UI
                 }
 
                 var bufferText = "";
-                bufferText += $"<b>Rooster Name:</b> {item.Rooster.Name}\n";
+                bufferText += $"<b>Rooster Name:</b> {item.Chicken.Name}\n";
                 foreach (var gene in rooster.Genes)
                 {
                     bufferText += $"<b>Gene:</b> {gene.GeneName} - %{gene.GenePassingChance}\n";

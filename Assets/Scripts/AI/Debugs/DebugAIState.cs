@@ -1,4 +1,4 @@
-using AI.Roosters;
+using AI.Chickens;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,8 +9,8 @@ namespace AI.Debugs
     {
         [SerializeField]
         private RoosterAI   roosterAI;
-        [SerializeField]
-        private ChickenAI   chickenAI;
+        [FormerlySerializedAs("chickenAI")] [SerializeField]
+        private HenAI   henAI;
         [SerializeField]
         private ChickAI chickAI;
         [SerializeField] 
@@ -19,7 +19,7 @@ namespace AI.Debugs
         void Start()
         { 
             roosterAI  = GetComponent<RoosterAI>();
-            chickenAI  = GetComponent<ChickenAI>();
+            henAI  = GetComponent<HenAI>();
             chickAI = GetComponent<ChickAI>();
         }
 
@@ -30,9 +30,9 @@ namespace AI.Debugs
             {
                 stateText.text = $"{roosterAI.CurrentState}";
             }
-            else if (chickenAI)
+            else if (henAI)
             {
-                stateText.text = $"{chickenAI.CurrentState}";
+                stateText.text = $"{henAI.CurrentState}";
             }
             else if (chickAI)
             {

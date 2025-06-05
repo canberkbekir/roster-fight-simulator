@@ -1,12 +1,8 @@
-using Creatures.Roosters;
+using Creatures.Chickens.Base; 
 using UnityEngine;
 using Mirror;
 using Interactions.Base;
-using Managers;
-using Players;
-// for GameManager
-
-// for RoosterState
+using Managers; 
 
 namespace InventorySystem.Base
 {
@@ -19,7 +15,7 @@ namespace InventorySystem.Base
 
         [Tooltip("JSON metadata for dynamic items (serialized state).")]
         [TextArea]
-        [SerializeField] private Rooster rooster;
+        [SerializeField] private Chicken chicken;
 
         private ItemData _data;
         private ItemDataContainer _db;
@@ -38,9 +34,9 @@ namespace InventorySystem.Base
                 if (_data != null)
                     return $"Pick up {_data.DisplayName}";
 
-                if (rooster != null)
+                if (chicken != null)
                 { 
-                    return $"Pick up {rooster.Name}";
+                    return $"Pick up {chicken.Name}";
                 } 
                 return "Pick up";
             }
@@ -56,7 +52,7 @@ namespace InventorySystem.Base
             if (_data)
                 inv.AddItem(_data.ItemId, 1, null);
             else
-                inv.AddRooster(rooster);
+                inv.AddChicken(chicken);
 
             NetworkServer.Destroy(gameObject);
         }
@@ -65,11 +61,11 @@ namespace InventorySystem.Base
         /// Server-only setter for dynamic item JSON before spawning.
         /// </summary>
         [Server]
-        public void SetRooster(Rooster newRooster)
+        public void SetChicken(Chicken newChicken)
         {
             itemId   = null;
             _data    = null;
-            rooster = newRooster;
+            chicken = newChicken;
         }
     }
 }

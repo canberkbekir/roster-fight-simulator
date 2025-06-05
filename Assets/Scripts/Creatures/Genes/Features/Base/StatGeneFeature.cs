@@ -1,5 +1,5 @@
-﻿using Creatures.Genes.Base;
-using Creatures.Roosters.Components;
+﻿using Creatures.Chickens.Base.Components;
+using Creatures.Genes.Base;
 
 namespace Creatures.Genes.Features.Base
 {

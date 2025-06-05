@@ -1,7 +1,7 @@
+using Creatures.Chickens.Base.Components;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
 using Creatures.Genes.Features.Base;
-using Creatures.Roosters.Components;
 using UnityEngine;
 
 namespace Creatures.Genes.Features

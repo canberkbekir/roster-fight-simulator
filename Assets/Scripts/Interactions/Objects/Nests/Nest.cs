@@ -1,6 +1,6 @@
 using System;
-using Creatures.Eggs;
-using Creatures.Roosters.Components;
+using Creatures.Chickens.Eggs;
+using Creatures.Chickens.Roosters.Components;
 using Mirror;
 using UnityEngine;
 

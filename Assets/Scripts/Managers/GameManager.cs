@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Mirror;
+using Sirenix.OdinInspector;
+using UnityEngine.Serialization;
 
 namespace Managers
 {
@@ -16,6 +19,11 @@ namespace Managers
         public ContainerManager ContainerManager => containerManager;
         public EggManager EggManager => eggManager;
         public BreedingManager BreedingManager => breedingManager;
+         
+        [Header("Settings for Debug")] 
+        [SerializeField]private float[] gameTimeRate;
+
+        private int _currentIndex;
         void Awake()
         {
             if (Instance != null && Instance != this)
@@ -26,8 +34,32 @@ namespace Managers
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-        } 
- 
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                _currentIndex++;
+                if (_currentIndex >= gameTimeRate.Length)
+                    _currentIndex = 0;
+
+                Time.timeScale = gameTimeRate[_currentIndex];
+                Debug.Log($"Game time rate changed to: {gameTimeRate[_currentIndex]}");
+                
+            }
+            else if (Input.GetKeyDown(KeyCode.F1))
+            {
+                _currentIndex--;
+                if (_currentIndex < 0)
+                    _currentIndex = gameTimeRate.Length - 1;
+
+                Time.timeScale = gameTimeRate[_currentIndex];
+                Debug.Log($"Game time rate changed to: {gameTimeRate[_currentIndex]}");
+                
+            }
+        }
+
         void OnDestroy()
         {
             if (Instance == this)

@@ -1,4 +1,4 @@
-﻿using Creatures.Eggs;
+﻿using Creatures.Chickens.Eggs;
 using Creatures.Genes;
 using Creatures.Genes.Base;
 using Interactions.Objects.Nests;

@@ -1,15 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
-using Creatures.Roosters;
-using Creatures.Roosters.Components;
+using Creatures.Chickens.Roosters;
+using Creatures.Chickens.Roosters.Components; 
 using Interactions.Base;
 using InventorySystem.Base;
 using Managers;
 using Mirror;
-using Players;
-using UI;
-using UnityEngine;
-using UnityEngine.Serialization;
+using Players; 
+using UnityEngine; 
 
 namespace Interactions.Objects.Breeders
 {
@@ -26,7 +24,7 @@ namespace Interactions.Objects.Breeders
         private RoosterSpawnerManager _roosterSpawnerManager; 
 
         public RoosterEntity[] RoosterEntities => parentForRoosterEntities.GetComponentsInChildren<RoosterEntity>();
-        public Rooster[] CurrentRoosters => (from entity in RoosterEntities where entity != null && entity.Rooster != null select entity.Rooster).ToArray();
+        public Rooster[] CurrentRoosters => (from entity in RoosterEntities where entity != null && entity.Chicken != null select entity.Chicken).ToArray();
 
         private void Awake()
         {
@@ -57,14 +55,14 @@ namespace Interactions.Objects.Breeders
                 return;
             }
  
-            var rooster = selectedItem.Rooster;
+            var rooster = selectedItem.Chicken;
             if (rooster == null)
             {
                 Debug.LogError("Selected rooster data is null.");
                 return;
             }
  
-            AddRooster(rooster);
+            // AddRooster(rooster);
             inventory.RemoveItem(selectedItem.ItemId, 1, rooster);
         }
         

@@ -1,5 +1,5 @@
 ﻿using System;
-using Creatures.Roosters;
+using Creatures.Chickens.Base; 
 using UnityEngine;
 
 namespace InventorySystem.Base
@@ -10,14 +10,14 @@ namespace InventorySystem.Base
         [SerializeField] private readonly string _itemId;
         [SerializeField] private readonly ItemType _itemType;
         [SerializeField] private readonly int    _quantity;
-        [SerializeField] private readonly Rooster _rooster;
+        [SerializeField] private readonly Chicken _chicken;
 
         public string ItemId    => _itemId;       // matches ItemData.ItemId
         public ItemType Type    => _itemType;     // e.g. Resource, Equipment, Rooster
         public int Quantity     => _quantity;     // how many in this stack
-        public Rooster Rooster  => _rooster;     // optional JSON blob
+        public Chicken Chicken  => _chicken;     // optional JSON blob
 
-        public bool HasRooster => Rooster != null;
+        public bool HasRooster => Chicken != null;
         public bool IsRooster   => _itemType == ItemType.Rooster;
         public bool IsStackable => !IsRooster;    // roosters are unique/non-stackable
         public bool IsEmpty     => string.IsNullOrEmpty(_itemId) && !HasRooster;
@@ -25,17 +25,17 @@ namespace InventorySystem.Base
         public static InventoryItem Empty => default;
 
         // Primary constructor
-        public InventoryItem(string itemId, ItemType type, int quantity = 1, Rooster rooster = null)
+        public InventoryItem(string itemId, ItemType type, int quantity = 1, Chicken chicken = null)
         {
             _itemId   = itemId;
             _itemType = type;
             _quantity = quantity;
-            _rooster = rooster;
+            _chicken = chicken;
         }
 
         // Returns a copy with a different quantity
         public InventoryItem WithQuantity(int newQty)
-            => new InventoryItem(_itemId, _itemType, newQty, _rooster); 
+            => new InventoryItem(_itemId, _itemType, newQty, _chicken); 
         public override string ToString()
             => $"{_itemType}:{_itemId} x{_quantity}" + (HasRooster ? " [meta]" : "");
 
@@ -44,12 +44,12 @@ namespace InventorySystem.Base
             => _itemId   == other._itemId
                && _itemType == other._itemType
                && _quantity == other._quantity
-               && _rooster == other._rooster;
+               && _chicken == other._chicken;
 
         public override bool Equals(object obj)
             => obj is InventoryItem other && Equals(other);
 
         public override int GetHashCode()
-            => HashCode.Combine(_itemId, _itemType, _quantity, _rooster);
+            => HashCode.Combine(_itemId, _itemType, _quantity, _chicken);
     }
 }

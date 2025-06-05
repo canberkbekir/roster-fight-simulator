@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Creatures.Eggs;
+using Creatures.Chickens.Eggs;
+using Creatures.Chickens.Hens.Components;
+using Creatures.Chickens.Roosters.Components;
 using Creatures.Genes;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
-using Creatures.Roosters.Components;
 using Interactions.Objects.Nests;
 using Mirror;
 using UnityEngine;
@@ -32,17 +33,17 @@ namespace Managers
         }
  
         [Server]
-        public Egg SpawnEggAndAssignToNest(RoosterEntity mother, RoosterEntity father, Nest nest)
+        public Egg SpawnEggAndAssignToNest(HenEntity mother, RoosterEntity father, Nest nest)
         {
-            if (mother == null || father == null || nest == null)
+            if (!mother || !father || !nest)
             {
                 Debug.LogError("[BreedingManager] SpawnEggAndAssignToNest: one argument was null.");
                 return null;
             }
  
             var mixed = CrossGenes(
-                mother.Rooster.Genes,
-                father.Rooster.Genes
+                mother.Chicken.Genes,
+                father.Chicken.Genes
             );
  
             var newEggNetId = _eggManager.SpawnEggWithGenes(nest, mixed);

@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Creatures.Chickens.Base;
+using Creatures.Chickens.Hens;
+using Creatures.Chickens.Hens.Components;
+using Creatures.Chickens.Roosters;
+using Creatures.Chickens.Roosters.Components;
 using Creatures.Genes;
 using Creatures.Genes.Base;
-using Creatures.Genes.Base.ScriptableObjects;
-using Creatures.Roosters;
-using Creatures.Roosters.Components;
+using Creatures.Genes.Base.ScriptableObjects; 
 using Mirror;
 using UnityEngine;
 
@@ -33,6 +36,26 @@ namespace Managers
             CmdSpawnRandomCreature(spawnPoint.position, spawnPoint.rotation, type);
         }
 
+        public void RequestSpawnChickenAt(Vector3 spawnPos, Chicken chicken, Quaternion? spawnRot = null)
+        {
+            if (!isClient) return;
+            var rot = spawnRot ?? Quaternion.identity;
+
+            var geneSyncs = chicken.Genes.Select(g => new GeneSync(g)).ToArray();
+            switch (chicken)
+            { 
+                case Rooster rooster:
+                    CmdSpawnRooster(spawnPos, rooster, geneSyncs, rot);
+                    break;
+                case Hen hen:
+                    CmdSpawnHen(spawnPos, hen, geneSyncs, rot);
+                    break;
+                default:
+                    Debug.LogError("Unknown chicken type for spawning.");
+                    break;
+            } 
+        }
+
         /// <summary>
         /// Client → Server: spawn a specific rooster with provided Rooster data.
         /// </summary>
@@ -41,22 +64,19 @@ namespace Managers
             if (!isClient) return;
             var rot = spawnRot ?? Quaternion.identity;
 
-            var geneSyncs = rooster.Genes.Select(g => new GeneSync(g)).ToArray();
-            rooster.Gender = RoosterGender.Male; // enforce male for Rooster
+            var geneSyncs = rooster.Genes.Select(g => new GeneSync(g)).ToArray(); 
             CmdSpawnRooster(spawnPos, rooster, geneSyncs, rot);
         }
 
         /// <summary>
         /// Client → Server: spawn a specific chicken (female) with provided Rooster data.
         /// </summary>
-        public void RequestSpawnChickenAt(Vector3 spawnPos, Rooster chickenData, Quaternion? spawnRot = null)
+        public void RequestSpawnHenAt(Vector3 spawnPos, Hen chickenData, Quaternion? spawnRot = null)
         {
             if (!isClient) return;
-            var rot = spawnRot ?? Quaternion.identity;
-
-            chickenData.Gender = RoosterGender.Female;
+            var rot = spawnRot ?? Quaternion.identity; 
             var geneSyncs = chickenData.Genes.Select(g => new GeneSync(g)).ToArray();
-            CmdSpawnChicken(spawnPos, chickenData, geneSyncs, rot);
+            CmdSpawnHen(spawnPos, chickenData, geneSyncs, rot);
         }
 
         /// <summary>
@@ -79,37 +99,37 @@ namespace Managers
         private void CmdSpawnRandomCreature(Vector3 spawnPos, Quaternion spawnRot, CreatureType type)
         {
             var randomGene = geneDataContainer.GetRandomGene();
-            var ro = new Rooster
-            {
-                Genes = new[] { new Gene(randomGene) },
-                Gender = (RoosterGender)UnityEngine.Random.Range(0, Enum.GetValues(typeof(RoosterGender)).Length)
-            };
+            var genes = new[] { new Gene(randomGene) };  
 
             switch (type)
             {
                 case CreatureType.Rooster:
-                    ro.Gender = RoosterGender.Male;
+                    var roster = new Rooster
                     {
-                        var entity = CreateRoosterEntity(ro);
-                        SpawnEntityInternal(entity, spawnPos, spawnRot);
-                    }
+                        Genes = genes,
+                    };
+                    var roosterEntity = CreateRoosterEntity(roster);
+                    SpawnEntityInternal(roosterEntity, spawnPos, spawnRot);
                     break;
 
                 case CreatureType.Chicken:
-                    ro.Gender = RoosterGender.Female;
+                    var hen = new Hen
                     {
-                        var entity = CreateChickenEntity(ro);
-                        SpawnEntityInternal(entity, spawnPos, spawnRot);
-                    }
+                        Genes = new[] { new Gene(randomGene) },
+                        Gender = (ChickenGender)UnityEngine.Random.Range(0,
+                            Enum.GetValues(typeof(ChickenGender)).Length)
+                    };
+                        
+                    var henEntity = CreateHenEntity(hen);
+                    SpawnEntityInternal(henEntity, spawnPos, spawnRot);
                     break;
 
-                case CreatureType.Chick:
-                    // randomize chick gender
-                    ro.Gender = (RoosterGender)UnityEngine.Random.Range(0, 2);
-                    {
-                        var entity = CreateChickEntity(ro);
-                        SpawnEntityInternal(entity, spawnPos, spawnRot);
-                    }
+                case CreatureType.Chick: 
+                    // ro.Gender = (ChickenGender)UnityEngine.Random.Range(0, 2);
+                    // {
+                    //     var entity = CreateChickEntity(ro);
+                    //     SpawnEntityInternal(entity, spawnPos, spawnRot);
+                    // }
                     break;
             }
         }
@@ -138,15 +158,14 @@ namespace Managers
                 validGenes.Add(gene);
             }
 
-            rooster.Genes = validGenes.ToArray();
-            rooster.Gender = RoosterGender.Male; // enforce male
+            rooster.Genes = validGenes.ToArray(); 
 
             var entity = CreateRoosterEntity(rooster);
             SpawnEntityInternal(entity, spawnPos, spawnRot);
         }
 
         [Command(requiresAuthority = false)]
-        private void CmdSpawnChicken(Vector3 spawnPos, Rooster chickenData, GeneSync[] geneSyncs, Quaternion spawnRot)
+        private void CmdSpawnHen(Vector3 spawnPos, Hen chickenData, GeneSync[] geneSyncs, Quaternion spawnRot)
         {
             if (chickenData == null)
             {
@@ -169,10 +188,9 @@ namespace Managers
                 validGenes.Add(gene);
             }
 
-            chickenData.Genes = validGenes.ToArray();
-            chickenData.Gender = RoosterGender.Female;
+            chickenData.Genes = validGenes.ToArray(); 
 
-            var entity = CreateChickenEntity(chickenData);
+            var entity = CreateHenEntity(chickenData);
             SpawnEntityInternal(entity, spawnPos, spawnRot);
         }
 
@@ -210,12 +228,12 @@ namespace Managers
 
         #region Helpers
 
-        private void SpawnEntityInternal(RoosterEntity entity, Vector3 pos, Quaternion rot)
+        private void SpawnEntityInternal(ChickenEntity entity, Vector3 pos, Quaternion rot)
         {
             entity.transform.SetPositionAndRotation(pos, rot);
 
             if (entity.TryGetComponent(out InventorySystem.Base.ItemWorld itemWorld))
-                itemWorld.SetRooster(entity.Rooster);
+                itemWorld.SetChicken(entity.Chicken);
 
             NetworkServer.Spawn(entity.gameObject, connectionToClient);
         }
@@ -234,14 +252,15 @@ namespace Managers
             if (ent == null)
                 throw new MissingComponentException($"Prefab '{roosterEntityPrefab.name}' lacks RoosterEntity.");
 
-            var rooster = new Rooster { Genes = new[] { new Gene(geneData) }, Gender = RoosterGender.Male };
+            var rooster = new Rooster();
+            rooster.Genes = new[] { new Gene(geneData) };
             ent.Init(rooster);
             return ent;
         }
 
         private RoosterEntity CreateRoosterEntity(Rooster rooster)
         {
-            if (roosterEntityPrefab == null)
+            if (!roosterEntityPrefab)
                 throw new UnassignedReferenceException("roosterEntityPrefab must be assigned.");
 
             if (rooster == null)
@@ -253,56 +272,51 @@ namespace Managers
                            ?? throw new ArgumentException($"Gene ID {g.GeneId} not found.");
                 return new Gene(data);
             }).ToArray();
-
-            rooster.Gender = RoosterGender.Male;
-
+  
             var go = Instantiate(roosterEntityPrefab);
             var ent = go.GetComponent<RoosterEntity>();
-            if (ent == null)
+            if (!ent)
                 throw new MissingComponentException($"Prefab '{roosterEntityPrefab.name}' lacks RoosterEntity.");
 
             ent.Init(rooster);
             return ent;
         }
 
-        private RoosterEntity CreateChickenEntity(GeneData geneData)
+        private HenEntity CreateHenEntity(GeneData geneData)
         {
             if (chickenEntityPrefab == null)
                 throw new UnassignedReferenceException("chickenEntityPrefab must be assigned.");
 
             var go = Instantiate(chickenEntityPrefab);
-            var ent = go.GetComponent<RoosterEntity>();
+            var ent = go.GetComponent<HenEntity>();
             if (ent == null)
                 throw new MissingComponentException($"Prefab '{chickenEntityPrefab.name}' lacks RoosterEntity.");
 
-            var chicken = new Rooster { Genes = new[] { new Gene(geneData) }, Gender = RoosterGender.Female };
+            var chicken = new Hen { Genes = new[] { new Gene(geneData) } };
             ent.Init(chicken);
             return ent;
         }
 
-        private RoosterEntity CreateChickenEntity(Rooster chickenData)
+        private HenEntity CreateHenEntity(Hen henData)
         {
             if (chickenEntityPrefab == null)
                 throw new UnassignedReferenceException("chickenEntityPrefab must be assigned.");
 
-            if (chickenData == null)
-                throw new ArgumentNullException(nameof(chickenData));
+            if (henData == null)
+                throw new ArgumentNullException(nameof(henData));
 
-            chickenData.Genes = chickenData.Genes.Select(g =>
+            henData.Genes = henData.Genes.Select(g =>
             {
                 var data = geneDataContainer.GetGeneById(g.GeneId)
                            ?? throw new ArgumentException($"Gene ID {g.GeneId} not found.");
                 return new Gene(data);
-            }).ToArray();
-
-            chickenData.Gender = RoosterGender.Female;
-
+            }).ToArray(); 
             var go = Instantiate(chickenEntityPrefab);
-            var ent = go.GetComponent<RoosterEntity>();
+            var ent = go.GetComponent<HenEntity>();
             if (ent == null)
                 throw new MissingComponentException($"Prefab '{chickenEntityPrefab.name}' lacks RoosterEntity.");
 
-            ent.Init(chickenData);
+            ent.Init(henData);
             return ent;
         }
 

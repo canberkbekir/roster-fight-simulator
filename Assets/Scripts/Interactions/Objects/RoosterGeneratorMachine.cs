@@ -1,5 +1,4 @@
-using System;
-using Creatures.Roosters;
+using Creatures.Chickens.Base; 
 using Interactions.Base;
 using Managers;
 using UnityEngine;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Creatures.Roosters;
+using Creatures.Chickens.Base;
+using Creatures.Chickens.Roosters; 
 using InventorySystem.Base;
 using Managers;
 using Mirror;
@@ -105,7 +106,7 @@ namespace Players
         {
             // Try to stack in existing
             var existing = items.FirstOrDefault(i =>
-                i.ItemId == itemId && i.Rooster == rooster && i.IsStackable && !i.IsEmpty);
+                i.ItemId == itemId && i.Chicken == rooster && i.IsStackable && !i.IsEmpty);
 
             if (!existing.IsEmpty)
             {
@@ -130,7 +131,7 @@ namespace Players
         }
 
         [Server]
-        public void AddRooster(Rooster rooster)
+        public void AddChicken(Chicken chicken)
         {
             int idx = items.FindIndex(i => i.IsEmpty);
             if (idx < 0)
@@ -139,19 +140,19 @@ namespace Players
                 return;
             }
 
-            items[idx] = new InventoryItem(string.Empty, ItemType.Rooster, 1, rooster);
+            items[idx] = new InventoryItem(string.Empty, ItemType.Rooster, 1, chicken);
             OnItemAdded?.Invoke(items[idx]);
         }
 
         [Server]
-        public void RemoveItem(string itemId, int qty, Rooster rooster)
+        public void RemoveItem(string itemId, int qty, Chicken chicken)
         {
             var existing = items.FirstOrDefault(i =>
-                i.ItemId == itemId && i.Rooster == rooster && !i.IsEmpty);
+                i.ItemId == itemId && i.Chicken == chicken && !i.IsEmpty);
             if (existing.IsEmpty) return;
 
-            int idx = items.IndexOf(existing);
-            int keep = existing.Quantity - qty;
+            var idx = items.IndexOf(existing);
+            var keep = existing.Quantity - qty;
             if (keep > 0)
             {
                 items[idx] = existing.WithQuantity(keep);
@@ -169,7 +170,7 @@ namespace Players
         public void CmdAddItem(string id, int q, Rooster r) => AddItem(id, q, r);
 
         [Command]
-        public void CmdAddRooster(Rooster r) => AddRooster(r);
+        public void CmdAddRooster(Rooster r) => AddChicken(r);
 
         [Command]
         public void CmdRemoveItem(string id, int q, Rooster r) => RemoveItem(id, q, r);
@@ -184,14 +185,14 @@ namespace Players
             var dropPos = transform.position + transform.forward * dropDistance;
 
             if (item.IsRooster)
-                GameManager.Instance.RoosterSpawnerManager.RequestSpawnRoosterAt(dropPos, item.Rooster);
+                GameManager.Instance.RoosterSpawnerManager.RequestSpawnRoosterAt(dropPos, item.Chicken as Rooster);
             else
             {
                 var data = GameManager.Instance.ContainerManager.ItemDataContainer.Get(item.ItemId);
                 Instantiate(data.WorldPrefab, dropPos, Quaternion.identity);
             }
 
-            RemoveItem(item.ItemId, 1, item.Rooster);
+            RemoveItem(item.ItemId, 1, item.Chicken);
             OnItemDropped?.Invoke(item);
         }
     }
