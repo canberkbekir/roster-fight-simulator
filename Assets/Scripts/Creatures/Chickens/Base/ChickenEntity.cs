@@ -1,4 +1,5 @@
 using System;
+using AI.Base;
 using Creatures.Chickens.Base.Components;
 using Creatures.Chickens.Base.Utils;
 using Mirror;
@@ -18,6 +19,9 @@ namespace Creatures.Chickens.Base
         [SerializeField] protected ChickenAppearance appearance;
         [SerializeField] protected ChickenEquipment equipment;
         [SerializeField] protected ChickenReproduction reproduction;
+        [Space]
+        [Header("— Chicken References —")]
+        [SerializeField] protected BaseAI ai;
         
         
         public ChickenStats Stats { get; protected set; }
@@ -27,9 +31,10 @@ namespace Creatures.Chickens.Base
         public ChickenEquipment Equipment { get; protected set; }
         public ChickenReproduction Reproduction { get; protected set; }
         public string ChickenName => chickenName;
-        public ChickenGender Gender { get; protected set; }
+        public ChickenGender Gender => Chicken.Gender;
         public ChickenEventBus EventBus { get; protected set; }
         public Chicken Chicken { get; protected set; }
+        public BaseAI ChickenAI => ai;
         
         private bool _isInitialized;
         

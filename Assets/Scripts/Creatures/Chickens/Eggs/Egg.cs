@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Creatures.Chickens.Base;
+using Creatures.Chickens.Chicks.Components;
 using Creatures.Chickens.Roosters;
 using Creatures.Chickens.Roosters.Components;
 using Creatures.Genes;
@@ -80,7 +81,7 @@ namespace Creatures.Chickens.Eggs
             }
 
             var chickObject = Instantiate(chickPrefab, transform.position, Quaternion.identity);
-            var babyEntity = chickObject.GetComponent<RoosterEntity>();
+            var babyEntity = chickObject.GetComponent<ChickEntity>();
             if (!babyEntity)
             {
                 Debug.LogError("Egg: chickPrefab has no RoosterEntity component!");

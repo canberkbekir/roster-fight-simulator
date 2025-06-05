@@ -24,7 +24,7 @@ namespace Interactions.Objects.Breeders
         private RoosterSpawnerManager _roosterSpawnerManager; 
 
         public RoosterEntity[] RoosterEntities => parentForRoosterEntities.GetComponentsInChildren<RoosterEntity>();
-        public Rooster[] CurrentRoosters => (from entity in RoosterEntities where entity != null && entity.Chicken != null select entity.Chicken).ToArray();
+        public Rooster[] CurrentRoosters =>null;
 
         private void Awake()
         {

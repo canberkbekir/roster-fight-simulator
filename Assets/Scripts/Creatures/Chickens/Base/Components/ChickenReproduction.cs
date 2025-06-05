@@ -119,7 +119,7 @@ namespace Creatures.Chickens.Base.Components
                 return;
             }
 
-            if (nest.CurrentChicken != _owner)
+            if (nest.CurrentHen != _owner)
             {
                 Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: current nest is occupied by another chicken.");
                 return;
@@ -142,7 +142,7 @@ namespace Creatures.Chickens.Base.Components
             if (!NetworkServer.spawned.TryGetValue(_currentNestNetId, out var nestObj)) return;
             var nest = nestObj.GetComponent<Nest>();
             if (!nest || !nest.CurrentEgg) return;
-            var ai = _owner.GetComponent<HenAI>();
+            var ai = _owner.ChickenAI as HenAI;
             if (ai)
                 ai.ForceSetNestAndIncubate(nest);
             else

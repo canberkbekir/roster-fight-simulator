@@ -1,5 +1,6 @@
 using System;
 using Creatures.Chickens.Eggs;
+using Creatures.Chickens.Hens.Components;
 using Creatures.Chickens.Roosters.Components;
 using Mirror;
 using UnityEngine;
@@ -18,11 +19,11 @@ namespace Interactions.Objects.Nests
         [SyncVar] private uint _occupiedChickenNetId = 0;
         [SyncVar] private uint _occupiedEggNetId = 0;
 
-        private RoosterEntity _currentChicken;
+        private HenEntity _currentHen;
         private Egg _currentEgg;
 
         public Transform SpawnTransform => spawnTransform;
-        public RoosterEntity CurrentChicken => _currentChicken;
+        public HenEntity CurrentHen => _currentHen;
         public Egg CurrentEgg => _currentEgg; 
         public bool IsOccupied => _occupiedChickenNetId != 0 || _occupiedEggNetId != 0;
 
@@ -37,9 +38,9 @@ namespace Interactions.Objects.Nests
         /// (Yalnızca tavuğu atmak için kullanılıyordu; şimdi egg atma da ekleniyor.)
         /// </summary>
         [Server]
-        public void Assign(uint chickenNetId)
+        public void Assign(uint henNetId)
         {
-            if (chickenNetId == 0)
+            if (henNetId == 0)
             {
                 Debug.LogError($"[Nest:{name}] Assign failed: invalid chickenNetId=0");
                 return;
@@ -51,21 +52,21 @@ namespace Interactions.Objects.Nests
                 return;
             }
 
-            if (!NetworkServer.spawned.TryGetValue(chickenNetId, out var chObj))
+            if (!NetworkServer.spawned.TryGetValue(henNetId, out var chObj))
             {
-                Debug.LogError($"[Nest:{name}] Assign failed: chicken not found for netId={chickenNetId}");
+                Debug.LogError($"[Nest:{name}] Assign failed: chicken not found for netId={henNetId}");
                 return;
             }
-            var chickenEnt = chObj.GetComponent<RoosterEntity>();
-            if (!chickenEnt)
+            var henEnt = chObj.GetComponent<HenEntity>();
+            if (!henEnt)
             {
-                Debug.LogError($"[Nest:{name}] Assign failed: object {chickenNetId} has no RoosterEntity");
+                Debug.LogError($"[Nest:{name}] Assign failed: object {henNetId} has no RoosterEntity");
                 return;
             }
 
-            _occupiedChickenNetId = chickenNetId;
-            _currentChicken = chickenEnt;
-            chickenEnt.Reproduction.AssignNest(netId);
+            _occupiedChickenNetId = henNetId;
+            _currentHen = henEnt;
+            henEnt.Reproduction.AssignNest(netId);
         }
 
         /// <summary>
@@ -123,7 +124,7 @@ namespace Interactions.Objects.Nests
                 chickenEnt?.Reproduction.ClearNestReferences();
             }
             _occupiedChickenNetId = 0;
-            _currentChicken = null; 
+            _currentHen = null; 
  
             OnEggHatched?.Invoke(this);
         } 
@@ -138,7 +139,7 @@ namespace Interactions.Objects.Nests
             _occupiedEggNetId = 0;
             _occupiedChickenNetId = 0;
             _currentEgg = null;
-            _currentChicken = null;
+            _currentHen = null;
         }
 
         #region Gizmo Visualization

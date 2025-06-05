@@ -1708,6 +1708,7 @@ MonoBehaviour:
   appearance: {fileID: 1612633076359501164}
   equipment: {fileID: 1969164283772462624}
   reproduction: {fileID: 8258850294865288350}
+  ai: {fileID: 959944817670358597}
 --- !u!114 &3575680096342574043
 MonoBehaviour:
   m_ObjectHideFlags: 0

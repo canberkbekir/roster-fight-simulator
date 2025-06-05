@@ -82,8 +82,7 @@ namespace AI.Chickens
                     EvaluateSeekMate();
                     break;
 
-                case RoosterState.Breed:
-                    // After breeding, go back to Wander
+                case RoosterState.Breed: 
                     _currentState = RoosterState.Wander;
                     break;
 
@@ -125,8 +124,8 @@ namespace AI.Chickens
             _wanderTimer -= Time.deltaTime;
             if (!_hasWanderDestination || _wanderTimer <= 0f)
             {
-                Vector3 randomDir = Random.insideUnitSphere * wanderRadius + transform.position;
-                if (NavMesh.SamplePosition(randomDir, out NavMeshHit hit, wanderRadius, NavMesh.AllAreas))
+                var randomDir = Random.insideUnitSphere * wanderRadius + transform.position;
+                if (NavMesh.SamplePosition(randomDir, out var hit, wanderRadius, NavMesh.AllAreas))
                 {
                     _wanderDestination = hit.position;
                     _hasWanderDestination = true;
@@ -188,7 +187,7 @@ namespace AI.Chickens
                 if (!chickenRepro || chickenRepro.IsPregnant)
                     continue;
                 
-                var chickenAI = chickenEnt.GetComponent<HenAI>();
+                var chickenAI = chickenEnt.ChickenAI as HenAI;
                 if (!chickenAI || chickenAI.CurrentState != ChickenState.Wander)
                     continue; 
 

@@ -140,7 +140,7 @@ namespace AI.Chickens
             if (!_hasWanderDestination || _wanderTimer <= 0f)
             {
                 var randomDir = Random.insideUnitSphere * wanderRadius + transform.position;
-                if (NavMesh.SamplePosition(randomDir, out NavMeshHit hit, wanderRadius, NavMesh.AllAreas))
+                if (NavMesh.SamplePosition(randomDir, out var hit, wanderRadius, NavMesh.AllAreas))
                 {
                     _wanderDestination = hit.position;
                     _hasWanderDestination = true;
@@ -174,7 +174,7 @@ namespace AI.Chickens
                     if (!nestLayer.Contains(col.gameObject.layer)) continue;
 
                     var nestComp = col.GetComponent<Nest>();
-                    if (!nestComp || nestComp.CurrentChicken) continue;
+                    if (!nestComp || nestComp.CurrentHen) continue;
 
                     var d = Vector3.Distance(transform.position, col.transform.position);
                     if (!(d < bestDist)) continue;
