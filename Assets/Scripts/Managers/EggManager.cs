@@ -45,7 +45,6 @@ namespace Managers
                 Destroy(eggObject);
                 return 0;
             }
- 
             eggComponent.Genes.Clear();
             foreach (var gs in geneSyncs)
                 eggComponent.Genes.Add(gs);

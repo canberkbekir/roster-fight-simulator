@@ -1490,6 +1490,7 @@ MonoBehaviour:
   containerManager: {fileID: 1427118041}
   eggManager: {fileID: 1225883037}
   breedingManager: {fileID: 1681769916}
+  inputReader: {fileID: 11400000, guid: d6230bf88ee239147a0615081b60c4e2, type: 2}
   gameTimeRate:
   - 1
   - 2
@@ -5325,7 +5326,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4058356679863663251, guid: 13fe3af355f252844bd7f0a044230e41, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.00030517578
       objectReference: {fileID: 0}
     - target: {fileID: 4236553519282798492, guid: 13fe3af355f252844bd7f0a044230e41, type: 3}
       propertyPath: m_Size

@@ -287,7 +287,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   invertLook: 1
-  mouseSensitivity: {x: 1, y: 1}
+  mouseSensitivity: 0.5
   minPitch: -80
   maxPitch: 80
 --- !u!114 &7769863523734533920
@@ -317,7 +317,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  mouseSensitivity: 2
+  mouseSensitivity: 0.001
 --- !u!114 &5458729824197039909
 MonoBehaviour:
   m_ObjectHideFlags: 0

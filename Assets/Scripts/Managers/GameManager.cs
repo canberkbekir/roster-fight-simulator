@@ -1,4 +1,5 @@
 ﻿using System;
+using Inputs;
 using UnityEngine;
 using Mirror;
 using Sirenix.OdinInspector;
@@ -15,10 +16,19 @@ namespace Managers
         [SerializeField] private ContainerManager containerManager;
         [SerializeField] private EggManager eggManager;
         [SerializeField] private BreedingManager breedingManager;
+        
+        [Space]
+        [Header("References")]
+        [SerializeField] private InputReader inputReader;
+        
+        // Properties for Managers
         public RoosterSpawnerManager RoosterSpawnerManager => roosterSpawnerManager;
         public ContainerManager ContainerManager => containerManager;
         public EggManager EggManager => eggManager;
         public BreedingManager BreedingManager => breedingManager;
+        
+        // Property for References
+        public InputReader InputReader => inputReader;
          
         [Header("Settings for Debug")] 
         [SerializeField]private float[] gameTimeRate;

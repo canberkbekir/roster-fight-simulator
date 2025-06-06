@@ -1,6 +1,5 @@
 using System;
 using Mirror;
-using UI;
 using UnityEngine;
 
 namespace Players
@@ -23,17 +22,17 @@ namespace Players
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
-            if (playerCamera == null)
+            if (!playerCamera)
             {
                 Debug.LogError("Player camera is not assigned in the inspector.");
                 return;
             }
-            if (playerInventory == null)
+            if (!playerInventory)
             {
                 Debug.LogError("Player inventory is not assigned in the inspector.");
                 return;
             }
-            if (playerInteraction == null)
+            if (!playerInteraction)
             {
                 Debug.LogError("Player interaction is not assigned in the inspector.");
                 return;
