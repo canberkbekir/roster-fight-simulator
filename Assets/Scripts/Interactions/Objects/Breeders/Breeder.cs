@@ -6,7 +6,8 @@ using Interactions.Base;
 using InventorySystem.Base;
 using Managers;
 using Mirror;
-using Players; 
+using Players;
+using Services;
 using UnityEngine; 
 
 namespace Interactions.Objects.Breeders
@@ -21,16 +22,16 @@ namespace Interactions.Objects.Breeders
         [SerializeField] private Transform parentForRoosterEntities;
         public List<Transform> SpawnPoints => spawnPoints;
         public int MaxRoosters => maxRoosters; 
-        private RoosterSpawnerManager _roosterSpawnerManager; 
+        private ChickenSpawnerService _chickenSpawnerService; 
 
         public RoosterEntity[] RoosterEntities => parentForRoosterEntities.GetComponentsInChildren<RoosterEntity>();
         public Rooster[] CurrentRoosters =>null;
 
         private void Awake()
         {
-            _roosterSpawnerManager = GameManager.Instance.RoosterSpawnerManager;
+            _chickenSpawnerService = GameManager.Instance.ChickenSpawnerService;
             
-            if (_roosterSpawnerManager == null)
+            if (_chickenSpawnerService == null)
             {
                 Debug.LogError("RoosterSpawnerManager is not initialized.");
             }  

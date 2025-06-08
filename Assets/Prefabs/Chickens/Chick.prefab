@@ -619,6 +619,56 @@ Transform:
   - {fileID: 6851614948073903916}
   m_Father: {fileID: 3473932249283123284}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!1 &3939420371173666867
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 915694566373702294}
+  - component: {fileID: 4097758562249015997}
+  m_Layer: 7
+  m_Name: GrowthHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &915694566373702294
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3939420371173666867}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 381758858823588801}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4097758562249015997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3939420371173666867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211d28c877624704093063e90d5761a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  growthInterval: 5
+  growthCooldown:
+    duration: 0
 --- !u!1 &4172215281872110521
 GameObject:
   m_ObjectHideFlags: 0
@@ -862,6 +912,7 @@ Transform:
   - {fileID: 5256506537230509511}
   - {fileID: 8854956570673248375}
   - {fileID: 2458180489649687404}
+  - {fileID: 915694566373702294}
   m_Father: {fileID: 3473932249283123284}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5221655573632763428
@@ -1153,6 +1204,7 @@ MonoBehaviour:
   equipment: {fileID: 5415792335585753965}
   reproduction: {fileID: 5781674094528113102}
   ai: {fileID: 5132058002898372745}
+  chickGrowth: {fileID: 4097758562249015997}
 --- !u!114 &631919899570372302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1650,6 +1702,8 @@ MonoBehaviour:
   syncInterval: 0
   tickInterval: 1
   agent: {fileID: 4118369126055265781}
+  tickCooldown:
+    duration: 0
   wanderRadius: 2
 --- !u!114 &9124539672174006840
 MonoBehaviour:

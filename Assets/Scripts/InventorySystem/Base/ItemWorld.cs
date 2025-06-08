@@ -22,7 +22,7 @@ namespace InventorySystem.Base
 
         private void Awake()
         {
-            _db = GameManager.Instance.ContainerManager.ItemDataContainer;
+            _db = GameManager.Instance.ContainerService.ItemDataContainer;
             if (!string.IsNullOrEmpty(itemId))
                 _data = _db.Get(itemId);
         }

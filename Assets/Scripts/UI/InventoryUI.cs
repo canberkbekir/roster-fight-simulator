@@ -102,7 +102,7 @@ namespace UI
                 else
                 {
                     var data = GameManager.Instance
-                        .ContainerManager.ItemDataContainer
+                        .ContainerService.ItemDataContainer
                         .Get(item.ItemId);
                     var icon = data != null ? data.Icon : null;
                     _slots[i].SetItem(icon, item.Quantity);

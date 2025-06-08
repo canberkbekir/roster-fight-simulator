@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Mirror;
 using Sirenix.OdinInspector;
-using UnityEngine.Serialization;
+using Utils;   
 
 namespace AI.Base
 { 
@@ -10,36 +10,39 @@ namespace AI.Base
     {
         [PropertyRange(0.1f, 5f)]
         [SerializeField]
-        private float tickInterval = 0.1f; 
+        private float tickInterval = 0.1f;
+
         [SerializeField]
         protected NavMeshAgent agent;
-
-        private float _tickTimer;
+ 
+        [InlineProperty]
+        [HideLabel]
+        [SerializeField]
+        private Cooldown tickCooldown;
 
         protected virtual void Awake()
-        {
-            if (agent) return;
-            agent = GetComponent<NavMeshAgent>();
-            if (!agent)
-            {
-                Debug.LogError("NavMeshAgent is not assigned and could not be found on the GameObject.");
-            }
+        { 
+            if (!agent) agent = GetComponent<NavMeshAgent>();
+            if (!agent) Debug.LogError("NavMeshAgent missing on " + name);
+ 
+            tickCooldown = new Cooldown(tickInterval);
         }
 
         public override void OnStartServer()
         {
-            base.OnStartServer();
-            _tickTimer = tickInterval;
+            base.OnStartServer(); 
+            tickCooldown.Start();
         }
 
         private void Update()
         {
             if (!isServer) return;
+ 
+            tickCooldown.Tick(Time.deltaTime);
 
-            _tickTimer -= Time.deltaTime;
-            if (_tickTimer > 0f) return;
+            if (!tickCooldown.IsReady) return;
+            tickCooldown.Start();
 
-            _tickTimer = tickInterval;
             StateTransition();
             StateTick();
         }
@@ -49,9 +52,6 @@ namespace AI.Base
 
         #region Movement Helpers
 
-        /// <summary>
-        /// Only call SetDestination if the agent is actually on a NavMesh.
-        /// </summary>
         protected void MoveTo(Vector3 position)
         {
             if (!agent || !agent.isOnNavMesh) return;
@@ -59,9 +59,6 @@ namespace AI.Base
             agent.SetDestination(position);
         }
 
-        /// <summary>
-        /// Only check remainingDistance if the agent is on a NavMesh.
-        /// </summary>
         protected bool HasReached(Vector3 position, float threshold = 0.5f)
         {
             if (!agent || !agent.isOnNavMesh) return false;
@@ -69,9 +66,6 @@ namespace AI.Base
             return agent.remainingDistance <= threshold;
         }
 
-        /// <summary>
-        /// Only call ResetPath if the agent is on a NavMesh.
-        /// </summary>
         protected void StopMoving()
         {
             if (!agent || !agent.isOnNavMesh) return;

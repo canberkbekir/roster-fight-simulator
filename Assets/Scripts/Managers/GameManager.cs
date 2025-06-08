@@ -2,7 +2,7 @@
 using Inputs;
 using UnityEngine;
 using Mirror;
-using Sirenix.OdinInspector;
+using Services;
 using UnityEngine.Serialization;
 
 namespace Managers
@@ -11,28 +11,38 @@ namespace Managers
     { 
         public static GameManager Instance { get; private set; }
         
+        [FormerlySerializedAs("chickenSpawnerManager")]
+        [FormerlySerializedAs("roosterSpawnerManager")]
         [Header("Managers")]
-        [SerializeField] private RoosterSpawnerManager roosterSpawnerManager;
-        [SerializeField] private ContainerManager containerManager;
-        [SerializeField] private EggManager eggManager;
-        [SerializeField] private BreedingManager breedingManager;
+        [SerializeField] private ChickenSpawnerService chickenSpawnerService;
+        [FormerlySerializedAs("containerManager")] [SerializeField] private ContainerService containerService;
+        [FormerlySerializedAs("eggManager")] [SerializeField] private EggService eggService;
+        [FormerlySerializedAs("breedingManager")] [SerializeField] private BreedingService breedingService; 
+        [SerializeField] private DayNightManager dayNightManager;
         
         [Space]
         [Header("References")]
         [SerializeField] private InputReader inputReader;
         
+        [Space]
+        [Header("Settings for Debug")] 
+        [SerializeField]private float[] gameTimeRate; 
+        
         // Properties for Managers
-        public RoosterSpawnerManager RoosterSpawnerManager => roosterSpawnerManager;
-        public ContainerManager ContainerManager => containerManager;
-        public EggManager EggManager => eggManager;
-        public BreedingManager BreedingManager => breedingManager;
+        public ChickenSpawnerService ChickenSpawnerService => chickenSpawnerService;
+        public ContainerService ContainerService => containerService;
+        public EggService EggService => eggService;
+        public BreedingService BreedingService => breedingService; 
+        public DayNightManager DayNightManager => dayNightManager;
         
         // Property for References
-        public InputReader InputReader => inputReader;
-         
-        [Header("Settings for Debug")] 
-        [SerializeField]private float[] gameTimeRate;
+        public InputReader InputReader => inputReader; 
+        
+        public static event Action OnGamePaused;
+        public static event Action OnGameResumed;
 
+        [SyncVar(hook = nameof(HandlePauseChanged))]
+        private bool _gamePaused = false; 
         private int _currentIndex;
         void Awake()
         {
@@ -69,6 +79,25 @@ namespace Managers
                 
             }
         }
+        
+        [Server]
+        public void PauseGame()
+        {
+            _gamePaused = true;
+        }
+
+        [Server]
+        public void ResumeGame()
+        {
+            _gamePaused = false;
+        }
+
+        private void HandlePauseChanged(bool oldVal, bool newVal)
+        {
+            if (newVal) OnGamePaused?.Invoke();
+            else        OnGameResumed?.Invoke();
+        }
+        
 
         void OnDestroy()
         {

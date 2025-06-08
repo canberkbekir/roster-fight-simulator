@@ -47,8 +47,6 @@ namespace Inputs
 
         public event Action SprintEvent;
         public event Action CrouchEvent;
-        
-        public event Action PauseEvent;
 
         public void OnMove(InputAction.CallbackContext context)
         {

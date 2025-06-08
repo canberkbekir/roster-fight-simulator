@@ -37,7 +37,7 @@ namespace Creatures.Chickens.Eggs
             _hatchTimer = hatchTime;
             _hasHatched = false;
             isIncubating = false;
-            _geneDataContainer = GameManager.Instance.ContainerManager.GeneDataContainer;
+            _geneDataContainer = GameManager.Instance.ContainerService.GeneDataContainer;
         }
 
         [ServerCallback]

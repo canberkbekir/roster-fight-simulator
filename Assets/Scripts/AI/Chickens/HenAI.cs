@@ -6,6 +6,7 @@ using Creatures.Chickens.Hens.Components;
 using Interactions.Objects.Nests;
 using Managers;
 using Mirror;
+using Services;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils;
@@ -47,7 +48,7 @@ namespace AI.Chickens
         private const int NestOverlapMax = 30;
         private readonly Collider[] _overlapNestsBuffer = new Collider[NestOverlapMax];
 
-        private BreedingManager _breedingManager; 
+        private BreedingService _breedingService; 
         private Nest _targetNest; 
  
         private Action<Nest> _onNestEggHatchedHandler;
@@ -69,8 +70,8 @@ namespace AI.Chickens
 
             CurrentState = ChickenState.Wander; 
 
-            _breedingManager = GameManager.Instance.BreedingManager;
-            if (_breedingManager == null)
+            _breedingService = GameManager.Instance.BreedingService;
+            if (_breedingService == null)
                 Debug.LogError($"[ChickenAI:{name}] BreedingManager not found!", this);
         } 
         protected override void StateTransition()
@@ -234,7 +235,7 @@ namespace AI.Chickens
                 return;
             }
  
-            var newEgg = _breedingManager.SpawnEggAndAssignToNest(
+            var newEgg = _breedingService.SpawnEggAndAssignToNest(
                 entity, 
                 entity.Reproduction.PregnantBy, 
                 _targetNest
