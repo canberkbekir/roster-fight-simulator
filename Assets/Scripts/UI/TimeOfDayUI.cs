@@ -12,9 +12,11 @@ namespace UI
         private void Start()
         {
             _dayNightManager = GameManager.Instance.DayNightManager;
-            if (_dayNightManager != null) return;
-            Debug.LogError("DayNightManager not found in GameManager.");
-            return; 
+            if (_dayNightManager == null)
+            {
+                Debug.LogError("DayNightManager not found in GameManager.");
+                return;
+            }
         }
 
         private void Update()
