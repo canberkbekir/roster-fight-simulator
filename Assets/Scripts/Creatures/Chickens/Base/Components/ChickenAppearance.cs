@@ -6,17 +6,15 @@ using UnityEngine;
 
 namespace Creatures.Chickens.Base.Components
 {
-    public class ChickenAppearance: NetworkBehaviour, IChickenComponent
-    { 
+    public class ChickenAppearance: ChickenComponentBase
+    {
         [Header("Handlers")] [SerializeField] private ChickenAppearanceHandler appearanceHandler;
-        
-        private ChickenEntity _owner;
-        
-        public void Init(ChickenEntity entity)
+
+        public override void Init(ChickenEntity entity)
         {
-            _owner = entity;
+            base.Init(entity);
             entity.EventBus.OnGeneInstancesUpdated += OnGeneInstancesUpdated;
-            
+
         }
 
         private void OnGeneInstancesUpdated(Gene[] genes)

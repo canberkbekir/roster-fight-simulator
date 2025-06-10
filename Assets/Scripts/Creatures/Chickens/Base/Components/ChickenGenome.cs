@@ -4,25 +4,24 @@ using Mirror;
 
 namespace Creatures.Chickens.Base.Components
 {
-    public class ChickenGenome : NetworkBehaviour, IChickenComponent
+    public class ChickenGenome : ChickenComponentBase
     {
-        private ChickenEntity _owner;
         private Gene[] _genes;
         public Gene[] Genes => _genes;
-        
+
         public void Init(ChickenEntity owner,Gene[] genes)
-        { 
-            if(_owner) return;
-            _owner = owner;
-            
-            if(!genes.Any()) return; 
+        {
+            if (Owner != null) return;
+            base.Init(owner);
+
+            if(!genes.Any()) return;
             SetGeneInstances(genes);
         }
         
         public void SetGeneInstances(Gene[] newGenes)
         {
             _genes = newGenes;
-            _owner.EventBus?.RaiseGeneInstancesUpdated(_genes);
+            Owner.EventBus?.RaiseGeneInstancesUpdated(_genes);
         }
     }
 }

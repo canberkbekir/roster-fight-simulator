@@ -10,7 +10,7 @@ namespace Creatures.Chickens.Base.Components
         Intelligence,
         Health
     }
-    public class ChickenStats : NetworkBehaviour, IChickenComponent
+    public class ChickenStats : ChickenComponentBase
     {
         [SyncVar(hook = nameof(OnStatChanged))] public int strength;
         [SyncVar] public int agility;
@@ -18,11 +18,9 @@ namespace Creatures.Chickens.Base.Components
         [SyncVar] public int intelligence;
         [SyncVar] public int health;
 
-        private ChickenEntity _owner;
-
-        public void Init(ChickenEntity entity)
+        public override void Init(ChickenEntity owner)
         {
-            _owner = entity;
+            base.Init(owner);
         }
 
         void OnStatChanged(int oldVal, int newVal)
