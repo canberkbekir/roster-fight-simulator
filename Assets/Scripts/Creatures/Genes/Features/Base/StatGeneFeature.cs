@@ -1,13 +1,26 @@
 ﻿using Creatures.Chickens.Base.Components;
 using Creatures.Genes.Base;
+using UnityEngine;
 
 namespace Creatures.Genes.Features.Base
 {
     public class StatGeneFeature : GeneFeature, IStatGeneFeature
     {
-        public StatType StatType { get; set; }
-        public int Value { get; set; }
-    } 
+        [SerializeField] private StatType statType;
+        [SerializeField] private int value;
+
+        public StatType StatType
+        {
+            get => statType;
+            set => statType = value;
+        }
+
+        public int Value
+        {
+            get => value;
+            set => this.value = value;
+        }
+    }
     
     public interface IStatGeneFeature : IGeneFeature
     {

@@ -1,15 +1,51 @@
 ﻿using Creatures.Genes.Base;
-
+using UnityEngine;
 namespace Creatures.Genes.Features.Base
 {
     public class SkillGeneFeature : GeneFeature,ISkillGeneFeature
     {
-        public string SkillName { get; set; }
-        public string SkillDescription { get; set;}
-        public int SkillLevel { get; set;}
-        public int SkillCooldown { get; set;}
-        public int SkillDuration { get;set; }
-        public SkillGeneType SkillGeneType { get; set; }
+        [SerializeField] private string skillName;
+        [SerializeField] private string skillDescription;
+        [SerializeField] private int skillLevel;
+        [SerializeField] private int skillCooldown;
+        [SerializeField] private int skillDuration;
+        [SerializeField] private SkillGeneType skillGeneType;
+
+        public string SkillName
+        {
+            get => skillName;
+            set => skillName = value;
+        }
+
+        public string SkillDescription
+        {
+            get => skillDescription;
+            set => skillDescription = value;
+        }
+
+        public int SkillLevel
+        {
+            get => skillLevel;
+            set => skillLevel = value;
+        }
+
+        public int SkillCooldown
+        {
+            get => skillCooldown;
+            set => skillCooldown = value;
+        }
+
+        public int SkillDuration
+        {
+            get => skillDuration;
+            set => skillDuration = value;
+        }
+
+        public SkillGeneType SkillGeneType
+        {
+            get => skillGeneType;
+            set => skillGeneType = value;
+        }
     }
     
     public interface ISkillGeneFeature : IGeneFeature
