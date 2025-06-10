@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using Creatures.Chickens.Base;
 using Creatures.Chickens.Chicks.Components;
-using Creatures.Chickens.Roosters;
-using Creatures.Chickens.Roosters.Components;
+using Creatures.Chickens.Chicks;
 using Creatures.Genes;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
@@ -84,12 +83,12 @@ namespace Creatures.Chickens.Eggs
             var babyEntity = chickObject.GetComponent<ChickEntity>();
             if (!babyEntity)
             {
-                Debug.LogError("Egg: chickPrefab has no RoosterEntity component!");
+                Debug.LogError("Egg: chickPrefab has no ChickEntity component!");
                 Destroy(chickObject);
                 return;
             }
- 
-            var babyData = new Rooster
+
+            var babyData = new Chick
             {
                 Gender = (Random.value < 0.5f) ? ChickenGender.Male : ChickenGender.Female,
                 Genes = new List<Gene>().ToArray()
