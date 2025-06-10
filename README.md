@@ -21,5 +21,13 @@ All dependencies are managed through the Unity Package Manager. Important packag
 3. Open `Assets/Scenes/SampleScene.unity`
 4. Enter Play mode to try the simulation
 
+## Gene System Overview
+
+`GeneData` assets (`Assets/Scripts/Creatures/Genes/Base/ScriptableObjects/GeneData.cs`) represent individual genes. Each gene contains a set of `GeneFeatureData` objects (`Assets/Scripts/Creatures/Genes/Base/ScriptableObjects/GeneFeatureData.cs`) which describe how that gene affects a chicken. Concrete feature types such as `StatGeneFeatureData`, `AppearanceGeneFeatureData` and `SkillGeneFeatureData` live in `Assets/Scripts/Creatures/Genes/Features/`.
+
+During breeding, `BreedingService.CrossGenes` (`Assets/Scripts/Services/BreedingService.cs`) mixes the gene arrays from a rooster and a hen. Genes with the same ID are randomly chosen from either parent before being passed to the new egg.
+
+When a chicken's genome changes, components react to the features inside each gene. For appearance genes, `ChickenAppearance` dispatches features to `ChickenAppearanceHandler` and `BodyPart` objects (see `Assets/Scripts/Creatures/Chickens/Base/Components/ChickenAppearance.cs` and `Assets/Scripts/Creatures/Chickens/Base/Utils/BodyPart.cs`) to update colors and other visuals. Stat and skill features follow a similar pattern and can be extended to modify values in `ChickenStats` or trigger abilities.
+
 ## License
 This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
