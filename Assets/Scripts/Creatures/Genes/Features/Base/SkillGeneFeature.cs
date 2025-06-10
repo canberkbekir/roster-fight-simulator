@@ -2,6 +2,7 @@
 
 namespace Creatures.Genes.Features.Base
 {
+    [System.Serializable]
     public class SkillGeneFeature : GeneFeature,ISkillGeneFeature
     {
         public string SkillName { get; set; }
