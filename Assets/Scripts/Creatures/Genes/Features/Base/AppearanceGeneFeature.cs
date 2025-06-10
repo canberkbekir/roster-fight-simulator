@@ -6,13 +6,49 @@ namespace Creatures.Genes.Features.Base
 {
     [Serializable]
     public class AppearanceGeneFeature :GeneFeature, IAppearanceGeneFeature
-    { 
-       [SerializeField] public Color ColorValue { get; set; }
-       [SerializeField]public Material MaterialValue { get; set; }
-       [SerializeField]public float SizeValue { get; set; }
-       [SerializeField]public Texture TextureValue { get; set; }
-       [SerializeField]public AppearanceGeneType AppearanceGeneType { get; set; }
-       [SerializeField]public AppearanceEffectType AppearanceEffectType { get; set; }
+    {
+        [SerializeField] private Color colorValue;
+        [SerializeField] private Material materialValue;
+        [SerializeField] private float sizeValue;
+        [SerializeField] private Texture textureValue;
+        [SerializeField] private AppearanceGeneType appearanceGeneType;
+        [SerializeField] private AppearanceEffectType appearanceEffectType;
+
+        public Color ColorValue
+        {
+            get => colorValue;
+            set => colorValue = value;
+        }
+
+        public Material MaterialValue
+        {
+            get => materialValue;
+            set => materialValue = value;
+        }
+
+        public float SizeValue
+        {
+            get => sizeValue;
+            set => sizeValue = value;
+        }
+
+        public Texture TextureValue
+        {
+            get => textureValue;
+            set => textureValue = value;
+        }
+
+        public AppearanceGeneType AppearanceGeneType
+        {
+            get => appearanceGeneType;
+            set => appearanceGeneType = value;
+        }
+
+        public AppearanceEffectType AppearanceEffectType
+        {
+            get => appearanceEffectType;
+            set => appearanceEffectType = value;
+        }
     }
 
     public interface IAppearanceGeneFeature : IGeneFeature
