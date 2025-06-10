@@ -41,7 +41,7 @@ namespace Creatures.Chickens.Chicks.Components
             Debug.Log("Growth cooldown finished");
             if (!Owner) return;
 
-            _chickenSpawnerService.RequestSpawnChickenAt(transform.position, Owner.Chicken);
+            _chickenSpawnerService.SpawnChickenServer(transform.position, Owner.Chicken);
             NetworkServer.Destroy(Owner.gameObject);
         }
 

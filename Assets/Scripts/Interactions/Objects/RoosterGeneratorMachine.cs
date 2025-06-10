@@ -16,7 +16,7 @@ namespace Interactions.Objects
         public override void OnInteract(GameObject interactor)
         {
             base.OnInteract(interactor); 
-            GameManager.Instance.ChickenSpawnerService.RequestSpawnRandomAt(spawnPoint, fixedType);
+            GameManager.Instance.ChickenSpawnerService.SpawnRandomServer(spawnPoint.position, fixedType, spawnPoint.rotation);
         }
     }
 }
