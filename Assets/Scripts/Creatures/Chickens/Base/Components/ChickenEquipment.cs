@@ -2,15 +2,13 @@
 
 namespace Creatures.Chickens.Base.Components
 {
-    public class ChickenEquipment: NetworkBehaviour, IChickenComponent
+    public class ChickenEquipment: ChickenComponentBase
     {
-        private ChickenEntity _owner;
-
-        public void Init(ChickenEntity entity)
+        public override void Init(ChickenEntity owner)
         {
-            _owner = entity;
+            base.Init(owner);
         }
 
-     
+
     }
 }

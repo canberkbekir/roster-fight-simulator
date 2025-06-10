@@ -7,44 +7,44 @@ using Utils;
 
 namespace Creatures.Chickens.Chicks.Components
 {
-    public class ChickGrowthHandler : NetworkBehaviour, IChickenComponent
+    public class ChickGrowthHandler : ChickenComponentBase
     {
-        private ChickEntity _owner;
-        [SerializeField] private float growthInterval = 5f; 
+        [SerializeField] private float growthInterval = 5f;
         [SerializeField] private Cooldown growthCooldown;
 
         private ChickenSpawnerService _chickenSpawnerService;
+        [ServerCallback]
         private void Start()
-        { 
-            if (!isServer) return;
+        {
             _chickenSpawnerService = GameManager.Instance.ChickenSpawnerService;
             growthCooldown = new Cooldown(growthInterval);
             growthCooldown.OnFinished += OnGrowthCooldownFinished;
             growthCooldown.Start();
-        } 
+        }
 
+        [ServerCallback]
         private void Update()
         {
-            if (!isServer) return;
-
-            growthCooldown.Tick(Time.deltaTime);  
+            growthCooldown.Tick(Time.deltaTime);
         }
 
-        public void Init(ChickEntity entity)
+        public override void Init(ChickenEntity entity)
         {
-            _owner = entity;  
+            base.Init(entity);
         }
         
         
+        [Server]
         private void OnGrowthCooldownFinished()
         {
-            Debug.Log("Growth cooldown finished");  
-            if (!_owner) return;
+            Debug.Log("Growth cooldown finished");
+            if (!Owner) return;
 
-            _chickenSpawnerService.RequestSpawnChickenAt(transform.position,_owner.Chicken);
-            Destroy(_owner.gameObject);
+            _chickenSpawnerService.RequestSpawnChickenAt(transform.position, Owner.Chicken);
+            NetworkServer.Destroy(Owner.gameObject);
         }
 
+        [ServerCallback]
         public void OnDestroy()
         {
             if (growthCooldown != null)

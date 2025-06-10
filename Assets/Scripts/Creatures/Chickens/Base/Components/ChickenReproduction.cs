@@ -8,15 +8,14 @@ using UnityEngine;
 
 namespace Creatures.Chickens.Base.Components
 { 
-    public class ChickenReproduction : NetworkBehaviour, IChickenComponent
+    public class ChickenReproduction : ChickenComponentBase
     {
         [SyncVar] private uint _currentNestNetId;
         [SyncVar] private uint _pregnantByNetId;
 
-        private ChickenEntity _owner; 
-        public void Init(ChickenEntity owner)
+        public override void Init(ChickenEntity owner)
         {
-            _owner = owner;
+            base.Init(owner);
         }
 
         [field: SyncVar]
@@ -119,7 +118,7 @@ namespace Creatures.Chickens.Base.Components
                 return;
             }
 
-            if (nest.CurrentHen != _owner)
+            if (nest.CurrentHen != Owner)
             {
                 Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: current nest is occupied by another chicken.");
                 return;
@@ -131,8 +130,11 @@ namespace Creatures.Chickens.Base.Components
                 return;
             }
 
-            if (!IsPregnant) return;
-            Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: already pregnant.");
+            if (IsPregnant)
+            {
+                Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: already pregnant.");
+                return;
+            }
         }
 
         public override void OnStartServer()
@@ -142,7 +144,7 @@ namespace Creatures.Chickens.Base.Components
             if (!NetworkServer.spawned.TryGetValue(_currentNestNetId, out var nestObj)) return;
             var nest = nestObj.GetComponent<Nest>();
             if (!nest || !nest.CurrentEgg) return;
-            var ai = _owner.ChickenAI as HenAI;
+            var ai = Owner.ChickenAI as HenAI;
             if (ai)
                 ai.ForceSetNestAndIncubate(nest);
             else
@@ -156,8 +158,8 @@ namespace Creatures.Chickens.Base.Components
             if (!otherRepro) return false;
             if (otherRepro == this) return false;  
  
-            var selfGender = _owner.Gender;
-            var otherGender = otherRepro._owner.Gender;
+            var selfGender = Owner.Gender;
+            var otherGender = otherRepro.Owner.Gender;
             if (selfGender == otherGender) return false;
 
             ChickenReproduction maleSide, femaleSide;
@@ -177,13 +179,13 @@ namespace Creatures.Chickens.Base.Components
  
             if (femaleSide.IsPregnant) return false; 
  
-            femaleSide.MarkPregnant(maleSide._owner.netId);
+            femaleSide.MarkPregnant(maleSide.Owner.netId);
  
             maleSide.ForceResetToWander();
- 
+
             femaleSide.ForcePregnantSeekNest();
 
-            Debug.Log($"[RoosterReproduction] {maleSide._owner.name} bred with {femaleSide._owner.name}");
+            Debug.Log($"[RoosterReproduction] {maleSide.Owner.name} bred with {femaleSide.Owner.name}");
             return true;
         }
 
@@ -192,7 +194,7 @@ namespace Creatures.Chickens.Base.Components
         [Server]
         public void ForceResetToWander()
         {
-            var ai = _owner.GetComponent<RoosterAI>();
+            var ai = Owner.GetComponent<RoosterAI>();
             if (ai != null)
                 ai.ForceToWander();
         }
@@ -200,7 +202,7 @@ namespace Creatures.Chickens.Base.Components
         [Server]
         public void ForcePregnantSeekNest()
         {
-            var ai = _owner.GetComponent<HenAI>();
+            var ai = Owner.GetComponent<HenAI>();
             if (ai != null)
                 ai.ForceSetPregnantSeekNest();
         }
