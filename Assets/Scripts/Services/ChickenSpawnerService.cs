@@ -6,6 +6,8 @@ using Creatures.Chickens.Hens;
 using Creatures.Chickens.Hens.Components;
 using Creatures.Chickens.Roosters;
 using Creatures.Chickens.Roosters.Components;
+using Creatures.Chickens.Chicks;
+using Creatures.Chickens.Chicks.Components;
 using Creatures.Genes;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
@@ -80,9 +82,9 @@ namespace Services
         }
 
         /// <summary>
-        /// Client → Server: spawn a specific chick with given Rooster data (baby genes).
+        /// Client → Server: spawn a specific chick with given Chick data (baby genes).
         /// </summary>
-        public void RequestSpawnChickAt(Vector3 spawnPos, Rooster chickData, Quaternion? spawnRot = null)
+        public void RequestSpawnChickAt(Vector3 spawnPos, Chick chickData, Quaternion? spawnRot = null)
         {
             if (!isClient) return;
             var rot = spawnRot ?? Quaternion.identity;
@@ -138,7 +140,7 @@ namespace Services
         }
 
         [Server]
-        public void SpawnChickServer(Vector3 spawnPos, Rooster chickData, Quaternion? spawnRot = null)
+        public void SpawnChickServer(Vector3 spawnPos, Chick chickData, Quaternion? spawnRot = null)
         {
             var rot = spawnRot ?? Quaternion.identity;
             var entity = CreateChickEntity(chickData);
@@ -249,7 +251,7 @@ namespace Services
         }
 
         [Command(requiresAuthority = false)]
-        private void CmdSpawnChick(Vector3 spawnPos, Rooster chickData, GeneSync[] geneSyncs, Quaternion spawnRot)
+        private void CmdSpawnChick(Vector3 spawnPos, Chick chickData, GeneSync[] geneSyncs, Quaternion spawnRot)
         {
             if (chickData == null)
             {
@@ -374,7 +376,7 @@ namespace Services
             return ent;
         }
 
-        private RoosterEntity CreateChickEntity(Rooster chickData)
+        private ChickEntity CreateChickEntity(Chick chickData)
         {
             if (!chickEntityPrefab)
                 throw new UnassignedReferenceException("chickEntityPrefab must be assigned.");
@@ -391,9 +393,9 @@ namespace Services
 
             // Gender may already be set on chickData
             var go = Instantiate(chickEntityPrefab);
-            var ent = go.GetComponent<RoosterEntity>();
+            var ent = go.GetComponent<ChickEntity>();
             if (ent == null)
-                throw new MissingComponentException($"Prefab '{chickEntityPrefab.name}' lacks RoosterEntity.");
+                throw new MissingComponentException($"Prefab '{chickEntityPrefab.name}' lacks ChickEntity.");
 
             ent.Init(chickData);
             return ent;
