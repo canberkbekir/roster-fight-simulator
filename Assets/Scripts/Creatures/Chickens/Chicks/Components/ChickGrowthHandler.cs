@@ -1,3 +1,4 @@
+using Creatures.Chickens.Base;
 using Creatures.Chickens.Base.Components;
 using Managers;
 using Mirror;
