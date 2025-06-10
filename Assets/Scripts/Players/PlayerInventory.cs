@@ -185,7 +185,7 @@ namespace Players
             var dropPos = transform.position + transform.forward * dropDistance;
 
             if (item.IsRooster)
-                GameManager.Instance.ChickenSpawnerService.RequestSpawnRoosterAt(dropPos, item.Chicken as Rooster);
+                GameManager.Instance.ChickenSpawnerService.SpawnRoosterServer(dropPos, item.Chicken as Rooster);
             else
             {
                 var data = GameManager.Instance.ContainerService.ItemDataContainer.Get(item.ItemId);

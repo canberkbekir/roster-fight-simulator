@@ -23,7 +23,7 @@ namespace Services
         [SerializeField] private GameObject chickenEntityPrefab;
         [SerializeField] private GameObject chickEntityPrefab;
 
-        #endregion 
+        #endregion
 
         #region Public Requests
 
@@ -93,13 +93,62 @@ namespace Services
 
         #endregion
 
-        #region Commands
+        #region Server Spawns
 
-        [Command(requiresAuthority = false)]
-        private void CmdSpawnRandomCreature(Vector3 spawnPos, Quaternion spawnRot, CreatureType type)
+        [Server]
+        public void SpawnRandomServer(Vector3 spawnPos, CreatureType type, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            SpawnRandomInternal(spawnPos, rot, type, null);
+        }
+
+        [Server]
+        public void SpawnChickenServer(Vector3 spawnPos, Chicken chicken, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+
+            switch (chicken)
+            {
+                case Rooster rooster:
+                    SpawnRoosterServer(spawnPos, rooster, rot);
+                    break;
+                case Hen hen:
+                    SpawnHenServer(spawnPos, hen, rot);
+                    break;
+                default:
+                    Debug.LogError("Unknown chicken type for spawning.");
+                    break;
+            }
+        }
+
+        [Server]
+        public void SpawnRoosterServer(Vector3 spawnPos, Rooster rooster, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            var entity = CreateRoosterEntity(rooster);
+            SpawnEntityInternal(entity, spawnPos, rot, null);
+        }
+
+        [Server]
+        public void SpawnHenServer(Vector3 spawnPos, Hen hen, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            var entity = CreateHenEntity(hen);
+            SpawnEntityInternal(entity, spawnPos, rot, null);
+        }
+
+        [Server]
+        public void SpawnChickServer(Vector3 spawnPos, Rooster chickData, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            var entity = CreateChickEntity(chickData);
+            SpawnEntityInternal(entity, spawnPos, rot, null);
+        }
+
+        private void SpawnRandomInternal(Vector3 spawnPos, Quaternion spawnRot, CreatureType type, NetworkConnectionToClient owner)
         {
             var randomGene = geneDataContainer.GetRandomGene();
-            var genes = new[] { new Gene(randomGene) };  
+            var genes = new[] { new Gene(randomGene) };
 
             switch (type)
             {
@@ -109,7 +158,7 @@ namespace Services
                         Genes = genes,
                     };
                     var roosterEntity = CreateRoosterEntity(roster);
-                    SpawnEntityInternal(roosterEntity, spawnPos, spawnRot);
+                    SpawnEntityInternal(roosterEntity, spawnPos, spawnRot, owner);
                     break;
 
                 case CreatureType.Chicken:
@@ -119,19 +168,24 @@ namespace Services
                         Gender = (ChickenGender)UnityEngine.Random.Range(0,
                             Enum.GetValues(typeof(ChickenGender)).Length)
                     };
-                        
+
                     var henEntity = CreateHenEntity(hen);
-                    SpawnEntityInternal(henEntity, spawnPos, spawnRot);
+                    SpawnEntityInternal(henEntity, spawnPos, spawnRot, owner);
                     break;
 
-                case CreatureType.Chick: 
-                    // ro.Gender = (ChickenGender)UnityEngine.Random.Range(0, 2);
-                    // {
-                    //     var entity = CreateChickEntity(ro);
-                    //     SpawnEntityInternal(entity, spawnPos, spawnRot);
-                    // }
+                case CreatureType.Chick:
                     break;
             }
+        }
+
+        #endregion
+
+        #region Commands
+
+        [Command(requiresAuthority = false)]
+        private void CmdSpawnRandomCreature(Vector3 spawnPos, Quaternion spawnRot, CreatureType type)
+        {
+            SpawnRandomInternal(spawnPos, spawnRot, type, connectionToClient);
         }
 
         [Command(requiresAuthority = false)]
@@ -161,7 +215,7 @@ namespace Services
             rooster.Genes = validGenes.ToArray(); 
 
             var entity = CreateRoosterEntity(rooster);
-            SpawnEntityInternal(entity, spawnPos, spawnRot);
+            SpawnEntityInternal(entity, spawnPos, spawnRot, connectionToClient);
         }
 
         [Command(requiresAuthority = false)]
@@ -191,7 +245,7 @@ namespace Services
             chickenData.Genes = validGenes.ToArray(); 
 
             var entity = CreateHenEntity(chickenData);
-            SpawnEntityInternal(entity, spawnPos, spawnRot);
+            SpawnEntityInternal(entity, spawnPos, spawnRot, connectionToClient);
         }
 
         [Command(requiresAuthority = false)]
@@ -221,21 +275,21 @@ namespace Services
             chickData.Genes = validGenes.ToArray();
 
             var entity = CreateChickEntity(chickData);
-            SpawnEntityInternal(entity, spawnPos, spawnRot);
+            SpawnEntityInternal(entity, spawnPos, spawnRot, connectionToClient);
         }
 
         #endregion
 
         #region Helpers
 
-        private void SpawnEntityInternal(ChickenEntity entity, Vector3 pos, Quaternion rot)
+        private void SpawnEntityInternal(ChickenEntity entity, Vector3 pos, Quaternion rot, NetworkConnectionToClient owner)
         {
             entity.transform.SetPositionAndRotation(pos, rot);
 
             if (entity.TryGetComponent(out InventorySystem.Base.ItemWorld itemWorld))
                 itemWorld.SetChicken(entity.Chicken);
 
-            NetworkServer.Spawn(entity.gameObject, connectionToClient);
+            NetworkServer.Spawn(entity.gameObject, owner);
         }
 
         #endregion
