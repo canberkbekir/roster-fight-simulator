@@ -95,7 +95,7 @@ namespace UI
             {
                 if (i >= _slots.Length) break;
 
-                if (item.IsRooster)
+                if (item.IsChicken)
                 {
                     _slots[i].SetItem(defaultRoosterIcon,null);
                 }

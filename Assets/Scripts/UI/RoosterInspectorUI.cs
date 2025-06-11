@@ -51,7 +51,7 @@ namespace UI
         {
             text.text = "";
 
-            if (item.IsRooster)
+            if (item.IsChicken)
             {
                 var rooster = item.Chicken;
                 if (rooster == null)

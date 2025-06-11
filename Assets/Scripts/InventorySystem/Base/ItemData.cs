@@ -81,6 +81,6 @@ namespace InventorySystem.Base
         Resource,
         Consumable,
         Equipment,
-        Rooster
+        Chicken
     }
 }

@@ -140,7 +140,7 @@ namespace Players
                 return;
             }
 
-            items[idx] = new InventoryItem(string.Empty, ItemType.Rooster, 1, chicken);
+            items[idx] = new InventoryItem(string.Empty, ItemType.Chicken, 1, chicken);
             OnItemAdded?.Invoke(items[idx]);
         }
 
@@ -184,7 +184,7 @@ namespace Players
 
             var dropPos = transform.position + transform.forward * dropDistance;
 
-            if (item.IsRooster)
+            if (item.IsChicken)
                 GameManager.Instance.ChickenSpawnerService.SpawnRoosterServer(dropPos, item.Chicken as Rooster);
             else
             {

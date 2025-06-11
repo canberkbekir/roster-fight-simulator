@@ -15,12 +15,10 @@ namespace InventorySystem.Base
         public string ItemId    => _itemId;       // matches ItemData.ItemId
         public ItemType Type    => _itemType;     // e.g. Resource, Equipment, Rooster
         public int Quantity     => _quantity;     // how many in this stack
-        public Chicken Chicken  => _chicken;     // optional JSON blob
-
-        public bool HasRooster => Chicken != null;
-        public bool IsRooster   => _itemType == ItemType.Rooster;
-        public bool IsStackable => !IsRooster;    // roosters are unique/non-stackable
-        public bool IsEmpty     => string.IsNullOrEmpty(_itemId) && !HasRooster;
+        public Chicken Chicken  => _chicken;     // optional JSON blob 
+        public bool IsChicken   => _itemType == ItemType.Chicken;
+        public bool IsStackable => !IsChicken;     
+        public bool IsEmpty     => string.IsNullOrEmpty(_itemId) && !IsChicken;
 
         public static InventoryItem Empty => default;
 
@@ -37,7 +35,7 @@ namespace InventorySystem.Base
         public InventoryItem WithQuantity(int newQty)
             => new InventoryItem(_itemId, _itemType, newQty, _chicken); 
         public override string ToString()
-            => $"{_itemType}:{_itemId} x{_quantity}" + (HasRooster ? " [meta]" : "");
+            => $"{_itemType}:{_itemId} x{_quantity}" + (IsChicken ? " [meta]" : "");
 
         // Equality implementations for SyncList lookups
         public bool Equals(InventoryItem other)
