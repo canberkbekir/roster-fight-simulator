@@ -1,5 +1,7 @@
 using Creatures.Chickens.Base;
 using Creatures.Chickens.Base.Components;
+using Creatures.Chickens.Hens;
+using Creatures.Chickens.Roosters;
 using Managers;
 using Mirror;
 using Services;
@@ -41,7 +43,11 @@ namespace Creatures.Chickens.Chicks.Components
             Debug.Log("Growth cooldown finished");
             if (!Owner) return;
 
-            _chickenSpawnerService.SpawnChickenServer(transform.position, Owner.Chicken);
+            Chicken adult = Owner.Chicken.Gender == ChickenGender.Male
+                ? new Rooster(Owner)
+                : new Hen(Owner);
+
+            _chickenSpawnerService.SpawnChickenServer(transform.position, adult);
             NetworkServer.Destroy(Owner.gameObject);
         }
 
