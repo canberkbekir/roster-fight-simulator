@@ -117,6 +117,9 @@ namespace Services
                 case Hen hen:
                     SpawnHenServer(spawnPos, hen, rot);
                     break;
+                case Chick chick:
+                    SpawnChickServer(spawnPos, chick, rot);
+                    break;
                 default:
                     Debug.LogError("Unknown chicken type for spawning.");
                     break;

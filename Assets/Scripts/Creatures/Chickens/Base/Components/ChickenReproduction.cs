@@ -26,19 +26,16 @@ namespace Creatures.Chickens.Base.Components
             get
             {
                 if (_currentNestNetId == 0)
-                {
-                    Debug.Log($"[RoosterReproduction:{name}] CurrentNest: null (no nest assigned)");
+                { 
                     return null;
                 }
 
                 if (NetworkServer.spawned.TryGetValue(_currentNestNetId, out var nestObj))
                 {
-                    var nest = nestObj.GetComponent<Nest>();
-                    Debug.Log($"[RoosterReproduction:{name}] CurrentNest: {nest?.name}");
+                    var nest = nestObj.GetComponent<Nest>(); 
                     return nest;
                 }
-
-                Debug.Log($"[RoosterReproduction:{name}] CurrentNest: null (nest not found in spawned objects)");
+ 
                 return null;
             }
         }
@@ -48,19 +45,16 @@ namespace Creatures.Chickens.Base.Components
             get
             {
                 if (_pregnantByNetId == 0)
-                {
-                    Debug.Log($"[RoosterReproduction:{name}] PregnantBy: null (no rooster assigned)");
+                { 
                     return null;
                 }
 
                 if (NetworkServer.spawned.TryGetValue(_pregnantByNetId, out var roosterObj))
                 {
-                    var rooster = roosterObj.GetComponent<RoosterEntity>();
-                    Debug.Log($"[RoosterReproduction:{name}] PregnantBy: {rooster?.name}");
+                    var rooster = roosterObj.GetComponent<RoosterEntity>(); 
                     return rooster;
                 }
-
-                Debug.Log($"[RoosterReproduction:{name}] PregnantBy: null (rooster not found in spawned objects)");
+ 
                 return null;
             }
         }
@@ -184,8 +178,7 @@ namespace Creatures.Chickens.Base.Components
             maleSide.ForceResetToWander();
 
             femaleSide.ForcePregnantSeekNest();
-
-            Debug.Log($"[RoosterReproduction] {maleSide.Owner.name} bred with {femaleSide.Owner.name}");
+ 
             return true;
         }
 
