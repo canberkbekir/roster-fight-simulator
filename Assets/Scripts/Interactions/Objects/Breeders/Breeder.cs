@@ -31,10 +31,16 @@ namespace Interactions.Objects.Breeders
         public override void OnInteract(GameObject interactor)
         {
             base.OnInteract(interactor);
- 
+
             if (!TryGetInventory(interactor, out var inventory))
-                return; 
- 
+                return;
+
+            if (CurrentChickens.Length >= maxChicken)
+            {
+                Debug.LogWarning("Breeder reached maximum capacity.");
+                return;
+            }
+
             var selectedItem = inventory.SelectedItem;
             if (selectedItem.Equals(InventoryItem.Empty))
             {
@@ -44,18 +50,49 @@ namespace Interactions.Objects.Breeders
 
             if (!selectedItem.IsChicken)
             {
-                Debug.LogWarning("Selected item is not a rooster.");
+                Debug.LogWarning("Selected item is not a chicken.");
                 return;
             }
- 
-            var rooster = selectedItem.Chicken;
-            if (rooster == null)
+
+            var chicken = selectedItem.Chicken;
+            if (chicken == null)
             {
-                Debug.LogError("Selected rooster data is null.");
+                Debug.LogError("Selected chicken data is null.");
                 return;
             }
-  
-            inventory.RemoveItem(selectedItem.ItemId, 1, rooster);
+
+            if (!TryGetSpawnPosition(interactor, out var spawnPos))
+            {
+                Debug.LogError("Unable to determine spawn position.");
+                return;
+            }
+
+            _chickenSpawnerService.SpawnChickenServer(spawnPos, chicken);
+
+            inventory.RemoveItem(selectedItem.ItemId, 1, chicken);
+        }
+
+        private bool TryGetSpawnPosition(GameObject interactor, out Vector3 pos)
+        {
+            pos = Vector3.zero;
+            if (!interactor.TryGetComponent<PlayerReferenceHandler>(out var handler))
+                return false;
+
+            var cam = handler.PlayerCamera;
+            if (cam == null)
+                return false;
+
+            var ray = new Ray(cam.transform.position, cam.transform.forward);
+            if (Physics.Raycast(ray, out var hit))
+            {
+                pos = hit.point;
+            }
+            else
+            {
+                pos = cam.transform.position + cam.transform.forward * 2f;
+            }
+
+            return true;
         }
         
         private bool TryGetInventory(GameObject newInteractor, out PlayerInventory inventory)
