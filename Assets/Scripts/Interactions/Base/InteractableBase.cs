@@ -1,4 +1,3 @@
-// InteractableBase.cs
 using UnityEngine;
 using Mirror;
 
