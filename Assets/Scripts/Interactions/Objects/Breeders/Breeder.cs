@@ -4,110 +4,102 @@ using InventorySystem.Base;
 using Managers;
 using Players;
 using Services;
-using UnityEngine; 
+using UnityEngine;
+
 namespace Interactions.Objects.Breeders
 {
     public class Breeder : InteractableBase
-    { 
+    {
         [Header("Settings")]
-        [SerializeField] private int maxChicken = 10;
+        [SerializeField] private int maxChickens = 10;
 
-        [Space] [Header("Spawn Settings")] 
-        [SerializeField] private Transform parentForRoosterEntities; 
-        public int MaxChicken => maxChicken;  
-        public ChickenEntity[] CurrentChickens =>parentForRoosterEntities.GetComponentsInChildren<ChickenEntity>();
-        
-        private ChickenSpawnerService _chickenSpawnerService;   
+        [Header("Spawn Settings")]
+        [SerializeField] private Transform chickenContainer; 
 
-        private void Awake()
+        private ChickenSpawnerService _spawner;
+
+        public ChickenEntity[] CurrentChickens => 
+            chickenContainer.GetComponentsInChildren<ChickenEntity>();
+
+        void Awake()
         {
-            _chickenSpawnerService = GameManager.Instance.ChickenSpawnerService;
-            
-            if (!_chickenSpawnerService)
-            {
-                Debug.LogError("RoosterSpawnerManager is not initialized.");
-            }  
-        } 
+            _spawner = GameManager.Instance.ChickenSpawnerService;
+            if (_spawner == null)
+                Debug.LogError("ChickenSpawnerService not initialized");
+        }
+
         public override void OnInteract(GameObject interactor)
         {
             base.OnInteract(interactor);
-
-            if (!TryGetInventory(interactor, out var inventory))
+ 
+            if (!TryPrepareSpawn(interactor, out var inventory, out var chicken, out var spawnPos))
                 return;
-
-            if (CurrentChickens.Length >= maxChicken)
-            {
-                Debug.LogWarning("Breeder reached maximum capacity.");
-                return;
-            }
-
-            var selectedItem = inventory.SelectedItem;
-            if (selectedItem.Equals(InventoryItem.Empty))
-            {
-                Debug.LogWarning("No item selected in player inventory.");
-                return;
-            }
-
-            if (!selectedItem.IsChicken)
-            {
-                Debug.LogWarning("Selected item is not a chicken.");
-                return;
-            }
-
-            var chicken = selectedItem.Chicken;
-            if (chicken == null)
-            {
-                Debug.LogError("Selected chicken data is null.");
-                return;
-            }
-
-            if (!TryGetSpawnPosition(interactor, out var spawnPos))
-            {
-                Debug.LogError("Unable to determine spawn position.");
-                return;
-            }
-
-            _chickenSpawnerService.SpawnChickenServer(spawnPos, chicken);
-
-            inventory.RemoveItem(selectedItem.ItemId, 1, chicken);
+ 
+            _spawner.SpawnChickenServer(spawnPos, chicken);
+            inventory.RemoveItem(inventory.SelectedItem.ItemId, 1, chicken);
         }
 
-        private bool TryGetSpawnPosition(GameObject interactor, out Vector3 pos)
+        private bool TryPrepareSpawn(GameObject interactor, 
+            out PlayerInventory inventory,
+            out Chicken chicken, 
+            out Vector3 spawnPos)
         {
-            pos = Vector3.zero;
-            if (!interactor.TryGetComponent<PlayerReferenceHandler>(out var handler))
+            inventory = null;
+            chicken    = null;
+            spawnPos   = default;
+ 
+            if (!interactor.TryGetComponent<PlayerReferenceHandler>(out var handler) ||
+                (inventory = handler.PlayerInventory) == null)
+            {
+                Debug.LogError("PlayerInventory not found");
                 return false;
+            }
+ 
+            if (CurrentChickens.Length >= maxChickens)
+            {
+                Debug.LogWarning("Breeder is full");
+                return false;
+            }
+ 
+            var item = inventory.SelectedItem;
+            if (!item.IsChicken || item.Equals(InventoryItem.Empty))
+            {
+                Debug.LogWarning("No chicken selected");
+                return false;
+            }
+ 
+            chicken = item.Chicken;
+            if (chicken == null)
+            {
+                Debug.LogError("Selected chicken data is null");
+                return false;
+            }
+ 
+            if (!TryGetSpawnPosition(handler.PlayerCamera, out spawnPos))
+            {
+                Debug.LogError("Could not compute spawn position");
+                return false;
+            }
 
-            var cam = handler.PlayerCamera;
-            if (cam == null)
+            return true;
+        }
+
+        private bool TryGetSpawnPosition(Camera cam, out Vector3 pos)
+        {
+            pos = default;
+            if (!cam) 
                 return false;
 
             var ray = new Ray(cam.transform.position, cam.transform.forward);
-            if (Physics.Raycast(ray, out var hit))
+            if (Physics.Raycast(ray, out var hitInfo))
             {
-                pos = hit.point;
+                pos = hitInfo.point;
             }
             else
             {
                 pos = cam.transform.position + cam.transform.forward * 2f;
             }
-
             return true;
         }
-        
-        private bool TryGetInventory(GameObject newInteractor, out PlayerInventory inventory)
-        {
-            if (!newInteractor.TryGetComponent<PlayerReferenceHandler>(out var handler))
-            {
-                Debug.LogError("PlayerReferenceHandler not found on interactor.");
-                inventory = null;
-                return false;
-            }
-
-            inventory = handler.PlayerInventory;
-            if (inventory) return true;
-            Debug.LogError("PlayerInventory not found on PlayerReferenceHandler.");
-            return false; 
-        }  
     }
 }
