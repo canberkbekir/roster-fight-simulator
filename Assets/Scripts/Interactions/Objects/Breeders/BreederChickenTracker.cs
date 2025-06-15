@@ -1,4 +1,5 @@
 using Creatures.Chickens.Base;
+using Mirror;
 using UnityEngine;
 
 namespace Interactions.Objects.Breeders
@@ -14,6 +15,7 @@ namespace Interactions.Objects.Breeders
             _chicken = chicken;
         }
 
+        [ServerCallback]
         private void OnDestroy()
         {
             if (_breeder && _chicken)

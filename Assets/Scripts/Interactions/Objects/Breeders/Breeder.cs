@@ -3,117 +3,173 @@ using System.Collections.Generic;
 using Interactions.Base;
 using InventorySystem.Base;
 using Managers;
+using Mirror;
 using Players;
 using Services;
 using UnityEngine;
 
 namespace Interactions.Objects.Breeders
-{
+{ 
     public class Breeder : InteractableBase
     {
+        #region Inspector Fields
+
         [Header("Settings")]
+        [Tooltip("Maximum number of chickens this breeder can hold")]
         [SerializeField] private int maxChickens = 10;
+ 
 
-        [Header("Spawn Settings")]
-        [SerializeField] private Transform chickenContainer;
+        #endregion
 
-        private ChickenSpawnerService _spawner;
+        #region Private Fields
+
+        private ChickenSpawnerService _spawnerService;
         private readonly List<ChickenEntity> _spawnedChickens = new List<ChickenEntity>();
 
-        public ChickenEntity[] CurrentChickens => _spawnedChickens.ToArray();
+        #endregion
 
-        void Awake()
+        #region Public Properties
+
+        /// <summary>
+        /// Gets currently spawned chickens.
+        /// </summary>
+        public IReadOnlyList<ChickenEntity> CurrentChickens => _spawnedChickens.AsReadOnly();
+
+        #endregion
+
+        #region Unity Callbacks
+
+        private void Awake()
         {
-            _spawner = GameManager.Instance.ChickenSpawnerService;
-            if (_spawner == null)
-                Debug.LogError("ChickenSpawnerService not initialized");
+            _spawnerService = GameManager.Instance.ChickenSpawnerService;
+            if (!_spawnerService)
+            {
+                Debug.LogError("ChickenSpawnerService not found on GameManager");
+            }
         }
 
+        #endregion
+
+        #region Interaction
+
+        /// <summary>
+        /// Called when player interacts with breeder.
+        /// Attempts to spawn a chicken if conditions are met.
+        /// </summary>
+        /// <param name="interactor">Player game object</param>
         public override void OnInteract(GameObject interactor)
         {
             base.OnInteract(interactor);
- 
-            if (!TryPrepareSpawn(interactor, out var inventory, out var chicken, out var spawnPos))
+
+            if (!CanSpawnChicken(interactor, out var inventory, out var selectedChicken, out var spawnPosition))
                 return;
- 
-            var entity = _spawner.SpawnChickenServer(spawnPos, chicken);
-            if (entity != null)
-            {
-                _spawnedChickens.Add(entity);
-                if (chickenContainer)
-                    entity.transform.SetParent(chickenContainer, true);
-                var tracker = entity.gameObject.AddComponent<BreederChickenTracker>();
-                tracker.Init(this, entity);
-            }
-            inventory.RemoveItem(inventory.SelectedItem.ItemId, 1, chicken);
+
+            SpawnChicken(inventory, selectedChicken, spawnPosition);
         }
 
-        private bool TryPrepareSpawn(GameObject interactor, 
-            out PlayerInventory inventory,
-            out Chicken chicken, 
-            out Vector3 spawnPos)
+        #endregion
+
+        #region Spawning Logic
+
+        /// <summary>
+        /// Checks all conditions required to spawn a chicken.
+        /// </summary>
+        private bool CanSpawnChicken(GameObject interactor, 
+                                     out PlayerInventory inventory, 
+                                     out Chicken chickenData, 
+                                     out Vector3 spawnPosition)
         {
             inventory = null;
-            chicken    = null;
-            spawnPos   = default;
+            chickenData = null;
+            spawnPosition = Vector3.zero;
  
             if (!interactor.TryGetComponent<PlayerReferenceHandler>(out var handler) ||
-                (inventory = handler.PlayerInventory) == null)
+                !(inventory = handler.PlayerInventory))
             {
-                Debug.LogError("PlayerInventory not found");
+                Debug.LogError("PlayerInventory not found on interactor");
                 return false;
             }
  
-            if (CurrentChickens.Length >= maxChickens)
+            if (_spawnedChickens.Count >= maxChickens)
             {
-                Debug.LogWarning("Breeder is full");
+                Debug.LogWarning("Breeder is at full capacity");
                 return false;
             }
  
             var item = inventory.SelectedItem;
             if (!item.IsChicken || item.Equals(InventoryItem.Empty))
             {
-                Debug.LogWarning("No chicken selected");
+                Debug.LogWarning("No chicken selected in inventory");
                 return false;
             }
- 
-            chicken = item.Chicken;
-            if (chicken == null)
+
+            chickenData = item.Chicken;
+            if (chickenData == null)
             {
                 Debug.LogError("Selected chicken data is null");
                 return false;
             }
  
-            if (!TryGetSpawnPosition(handler.PlayerCamera, out spawnPos))
+            if (!CalculateSpawnPosition(handler.PlayerCamera, out spawnPosition))
             {
-                Debug.LogError("Could not compute spawn position");
+                Debug.LogError("Failed to determine spawn position");
                 return false;
             }
 
             return true;
         }
 
-        private bool TryGetSpawnPosition(Camera cam, out Vector3 pos)
+        /// <summary>
+        /// Spawns a chicken on the server and tracks it.
+        /// </summary>
+        private void SpawnChicken(PlayerInventory inventory, Chicken chickenData, Vector3 position)
         {
-            pos = default;
-            if (!cam) 
-                return false;
+            var entity = _spawnerService.SpawnChickenServer(position, chickenData);
+            if (!entity) return; 
 
-            var ray = new Ray(cam.transform.position, cam.transform.forward);
-            if (Physics.Raycast(ray, out var hitInfo))
+            _spawnedChickens.Add(entity);
+
+            var tracker = entity.gameObject.AddComponent<BreederChickenTracker>();
+            tracker.Init(this, entity);
+
+            // Remove chicken item from inventory
+            inventory.RemoveItem(inventory.SelectedItem.ItemId, 1, chickenData);
+        }
+
+        /// <summary>
+        /// Calculates a valid spawn position based on camera view or default distance.
+        /// </summary>
+        private bool CalculateSpawnPosition(Camera playerCamera, out Vector3 position)
+        {
+            position = Vector3.zero;
+            if (!playerCamera) return false;
+
+            var ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+            if (Physics.Raycast(ray, out var hit))
             {
-                pos = hitInfo.point;
+                position = hit.point;
             }
             else
             {
-                pos = cam.transform.position + cam.transform.forward * 2f;
+                position = playerCamera.transform.position + playerCamera.transform.forward * 2f;
             }
             return true;
         }
 
+        #endregion
+
+        #region Server Methods
+
+        /// <summary>
+        /// Removes a chicken from tracking when it is destroyed or removed.
+        /// </summary>
+        [Server]
         public void UnregisterChicken(ChickenEntity entity)
         {
-            _spawnedChickens.Remove(entity);
+            if (_spawnedChickens.Contains(entity))
+                _spawnedChickens.Remove(entity);
         }
+
+        #endregion
     }
 }
