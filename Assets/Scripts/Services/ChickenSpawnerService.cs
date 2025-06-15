@@ -105,49 +105,49 @@ namespace Services
         }
 
         [Server]
-        public void SpawnChickenServer(Vector3 spawnPos, Chicken chicken, Quaternion? spawnRot = null)
+        public ChickenEntity SpawnChickenServer(Vector3 spawnPos, Chicken chicken, Quaternion? spawnRot = null)
         {
             var rot = spawnRot ?? Quaternion.identity;
 
             switch (chicken)
             {
                 case Rooster rooster:
-                    SpawnRoosterServer(spawnPos, rooster, rot);
-                    break;
+                    return SpawnRoosterServer(spawnPos, rooster, rot);
                 case Hen hen:
-                    SpawnHenServer(spawnPos, hen, rot);
-                    break;
+                    return SpawnHenServer(spawnPos, hen, rot);
                 case Chick chick:
-                    SpawnChickServer(spawnPos, chick, rot);
-                    break;
+                    return SpawnChickServer(spawnPos, chick, rot);
                 default:
                     Debug.LogError("Unknown chicken type for spawning.");
-                    break;
+                    return null;
             }
         }
 
         [Server]
-        public void SpawnRoosterServer(Vector3 spawnPos, Rooster rooster, Quaternion? spawnRot = null)
+        public RoosterEntity SpawnRoosterServer(Vector3 spawnPos, Rooster rooster, Quaternion? spawnRot = null)
         {
             var rot = spawnRot ?? Quaternion.identity;
             var entity = CreateRoosterEntity(rooster);
             SpawnEntityInternal(entity, spawnPos, rot, null);
+            return entity;
         }
 
         [Server]
-        public void SpawnHenServer(Vector3 spawnPos, Hen hen, Quaternion? spawnRot = null)
+        public HenEntity SpawnHenServer(Vector3 spawnPos, Hen hen, Quaternion? spawnRot = null)
         {
             var rot = spawnRot ?? Quaternion.identity;
             var entity = CreateHenEntity(hen);
             SpawnEntityInternal(entity, spawnPos, rot, null);
+            return entity;
         }
 
         [Server]
-        public void SpawnChickServer(Vector3 spawnPos, Chick chickData, Quaternion? spawnRot = null)
+        public ChickEntity SpawnChickServer(Vector3 spawnPos, Chick chickData, Quaternion? spawnRot = null)
         {
             var rot = spawnRot ?? Quaternion.identity;
             var entity = CreateChickEntity(chickData);
             SpawnEntityInternal(entity, spawnPos, rot, null);
+            return entity;
         }
 
         private void SpawnRandomInternal(Vector3 spawnPos, Quaternion spawnRot, CreatureType type, NetworkConnectionToClient owner)

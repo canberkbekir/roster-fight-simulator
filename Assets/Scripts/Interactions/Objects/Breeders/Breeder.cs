@@ -1,4 +1,5 @@
 using Creatures.Chickens.Base;
+using System.Collections.Generic;
 using Interactions.Base;
 using InventorySystem.Base;
 using Managers;
@@ -14,12 +15,12 @@ namespace Interactions.Objects.Breeders
         [SerializeField] private int maxChickens = 10;
 
         [Header("Spawn Settings")]
-        [SerializeField] private Transform chickenContainer; 
+        [SerializeField] private Transform chickenContainer;
 
         private ChickenSpawnerService _spawner;
+        private readonly List<ChickenEntity> _spawnedChickens = new List<ChickenEntity>();
 
-        public ChickenEntity[] CurrentChickens => 
-            chickenContainer.GetComponentsInChildren<ChickenEntity>();
+        public ChickenEntity[] CurrentChickens => _spawnedChickens.ToArray();
 
         void Awake()
         {
@@ -35,7 +36,15 @@ namespace Interactions.Objects.Breeders
             if (!TryPrepareSpawn(interactor, out var inventory, out var chicken, out var spawnPos))
                 return;
  
-            _spawner.SpawnChickenServer(spawnPos, chicken);
+            var entity = _spawner.SpawnChickenServer(spawnPos, chicken);
+            if (entity != null)
+            {
+                _spawnedChickens.Add(entity);
+                if (chickenContainer)
+                    entity.transform.SetParent(chickenContainer, true);
+                var tracker = entity.gameObject.AddComponent<BreederChickenTracker>();
+                tracker.Init(this, entity);
+            }
             inventory.RemoveItem(inventory.SelectedItem.ItemId, 1, chicken);
         }
 
@@ -100,6 +109,11 @@ namespace Interactions.Objects.Breeders
                 pos = cam.transform.position + cam.transform.forward * 2f;
             }
             return true;
+        }
+
+        public void UnregisterChicken(ChickenEntity entity)
+        {
+            _spawnedChickens.Remove(entity);
         }
     }
 }
