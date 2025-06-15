@@ -10,8 +10,7 @@ namespace Interactions.Base
 
         [Server]
         public virtual void OnInteract(GameObject interactor)
-        {
-            Debug.Log($"[InteractableBase] {interactor.name} interacted with {name}");
+        { 
         }
 
         [Command(requiresAuthority = false)]
