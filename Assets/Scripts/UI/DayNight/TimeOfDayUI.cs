@@ -28,8 +28,8 @@ namespace UI
 
         private void SetTimeOfDayText()
         { 
-            var hour = _dayNightManager.CurrentHour;
-            var minute = _dayNightManager.CurrentMinute;
+            var hour = _dayNightManager.HourOfDay;
+            var minute = _dayNightManager.MinuteOfHour;
  
             var formattedTime = $"{hour:D2}:{minute:D2}";
  

@@ -68,11 +68,6 @@ namespace UI
             
             promptText.text = obj.InteractionPrompt; 
             Show();
-        }
-        
-        public override void Hide()
-        {
-            base.Hide(); 
-        }  
+        } 
     }
 }

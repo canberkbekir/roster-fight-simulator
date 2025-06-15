@@ -84,8 +84,7 @@ namespace Players
 
         private void OnInvChanged(SyncList<InventoryItem>.Operation op, int idx,
                                   InventoryItem oldItem, InventoryItem newItem)
-        {
-            Debug.Log($"Inventory changed: {op} at {idx}");
+        { 
             ChangeSelectedSlot(SelectedSlot);
         }
 
@@ -103,27 +102,25 @@ namespace Players
 
         [Server]
         public void AddItem(string itemId, int qty, Rooster rooster)
-        {
-            // Try to stack in existing
+        { 
             var existing = items.FirstOrDefault(i =>
                 i.ItemId == itemId && i.Chicken == rooster && i.IsStackable && !i.IsEmpty);
 
             if (!existing.IsEmpty)
             {
-                int idx = items.IndexOf(existing);
-                int newQty = Mathf.Min(existing.Quantity + qty, maxStackSize);
+                var idx = items.IndexOf(existing);
+                var newQty = Mathf.Min(existing.Quantity + qty, maxStackSize);
                 items[idx] = existing.WithQuantity(newQty);
             }
             else
-            {
-                // Find first empty slot
-                int idx = items.FindIndex(i => i.IsEmpty);
+            { 
+                var idx = items.FindIndex(i => i.IsEmpty);
                 if (idx < 0)
                 {
                     Debug.LogWarning($"Inventory full – cannot add {itemId}");
                     return;
                 }
-                int addQty = Mathf.Min(qty, maxStackSize);
+                var addQty = Mathf.Min(qty, maxStackSize);
                 items[idx] = new InventoryItem(itemId, ItemType.Resource, addQty, rooster);
             }
 
@@ -133,7 +130,7 @@ namespace Players
         [Server]
         public void AddChicken(Chicken chicken)
         {
-            int idx = items.FindIndex(i => i.IsEmpty);
+            var idx = items.FindIndex(i => i.IsEmpty);
             if (idx < 0)
             {
                 Debug.LogWarning("Inventory full – cannot add new rooster");

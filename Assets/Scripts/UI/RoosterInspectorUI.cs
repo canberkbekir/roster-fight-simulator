@@ -84,7 +84,7 @@ namespace UI
             {
                 Hide();
             }
-        }
+        } 
 
         public override void Hide()
         {
