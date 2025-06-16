@@ -7,6 +7,10 @@ namespace Configs.DayNightManager
     [CreateAssetMenu(fileName = "TimeOfDayHours", menuName = "Configs/DayNightManager/TimeOfDayHours")]
     public class TimeOfDayHours : ScriptableObject
     {
+        [Header("Settings")]
+        [SerializeField] private int startHourOfDay = 6;
+        
+        [Space]
         [Header("Start hours for each segment (0–23)")]
         [Range(0, 23)] [SerializeField] private int startHourForMorning   = 6;
         [Range(0, 23)] [SerializeField] private int startHourForAfternoon = 12;
@@ -17,6 +21,7 @@ namespace Configs.DayNightManager
         public int StartHourForAfternoon => startHourForAfternoon;
         public int StartHourForEvening => startHourForEvening;
         public int StartHourForNight => startHourForNight;
+        public int StartHourOfDay => startHourOfDay;
 
         private void OnValidate()
         {

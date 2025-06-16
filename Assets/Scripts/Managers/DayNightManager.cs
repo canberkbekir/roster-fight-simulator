@@ -104,8 +104,9 @@ namespace Managers
 
         public override void OnStartServer()
         {
-            base.OnStartServer();
-            _normalizedTime = 0f; 
+            base.OnStartServer(); 
+            var startHour = timeOfDaySchedule.StartHourOfDay;
+            _normalizedTime = (startHour % 24) / 24f; 
         }
 
         public override void OnStartClient()
