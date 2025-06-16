@@ -47,13 +47,39 @@ namespace Services
                 father.Chicken.Genes
             );
  
-            var newEggNetId = _eggService.SpawnEggWithGenes(nest, mixed);
+            var newEggNetId = _eggService.SpawnEggWithGenes(nest, mixed, true);
             if (newEggNetId == 0)
             {
                 Debug.LogError("[BreedingManager] Failed to spawn egg via EggManager.");
                 return null;
             }
  
+            var spawnedEgg = nest.CurrentEgg;
+            if (spawnedEgg == null)
+            {
+                Debug.LogError("[BreedingManager] After spawning, nest.CurrentEgg is still null!");
+            }
+            return spawnedEgg;
+        }
+
+        [Server]
+        public Egg SpawnUnfertilizedEgg(HenEntity mother, Nest nest)
+        {
+            if (!mother || !nest)
+            {
+                Debug.LogError("[BreedingManager] SpawnUnfertilizedEgg: one argument was null.");
+                return null;
+            }
+
+            var genes = mother.Chicken.Genes.Select(g => new GeneSync(g)).ToArray();
+
+            var newEggNetId = _eggService.SpawnEggWithGenes(nest, genes, false);
+            if (newEggNetId == 0)
+            {
+                Debug.LogError("[BreedingManager] Failed to spawn egg via EggService.");
+                return null;
+            }
+
             var spawnedEgg = nest.CurrentEgg;
             if (spawnedEgg == null)
             {
