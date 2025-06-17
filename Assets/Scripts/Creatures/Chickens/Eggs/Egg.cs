@@ -21,8 +21,9 @@ namespace Creatures.Chickens.Eggs
  
         public class SyncGeneList : SyncList<GeneSync> { }
         public readonly SyncGeneList Genes = new SyncGeneList();
-        
+
         [SyncVar] public bool isIncubating = false;
+        [SyncVar] public bool isHatchable = true;
 
         private float _hatchTimer;
         private bool _hasHatched;
@@ -44,6 +45,7 @@ namespace Creatures.Chickens.Eggs
         {
             if (_hasHatched) return;
             if (!isIncubating) return;
+            if (!isHatchable) return;
 
             _hatchTimer -= Time.deltaTime;
             if (_hatchTimer <= 0f)
@@ -57,8 +59,9 @@ namespace Creatures.Chickens.Eggs
         [Server]
         public void StartIncubation()
         {
+            if (!isHatchable) return;
             if (isIncubating) return;
-            isIncubating = true; 
+            isIncubating = true;
             RpcPlayIncubationVFX();
         }
 

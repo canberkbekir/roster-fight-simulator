@@ -27,7 +27,7 @@ namespace Services
                 Debug.LogError("EggManager: eggPrefab is not assigned in the inspector.");
         } 
         [Server]
-        public uint SpawnEggWithGenes(Nest nest, GeneSync[] geneSyncs)
+        public uint SpawnEggWithGenes(Nest nest, GeneSync[] geneSyncs, bool isHatchable = true)
         {
             if (!nest)
             {
@@ -44,6 +44,7 @@ namespace Services
                 Destroy(eggObject);
                 return 0;
             }
+            eggComponent.isHatchable = isHatchable;
             eggComponent.Genes.Clear();
             foreach (var gs in geneSyncs)
                 eggComponent.Genes.Add(gs);
