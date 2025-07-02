@@ -60,10 +60,13 @@ namespace Creatures.Chickens.Base
             }
         }
 
-        [Server]
+        [Server] 
         public void AssignBreeder(Breeder breeder)
         {
             _breederNetId = breeder ? breeder.netId : 0;
+            Debug.Log(_breederNetId == 0
+                ? $"[ChickenEntity:{name}] Unassigned from breeder"
+                : $"[ChickenEntity:{name}] Assigned to breeder {_breederNetId}");
         }
         
         private bool _isInitialized;

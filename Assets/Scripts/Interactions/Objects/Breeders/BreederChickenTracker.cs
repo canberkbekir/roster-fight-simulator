@@ -18,10 +18,9 @@ namespace Interactions.Objects.Breeders
         [ServerCallback]
         private void OnDestroy()
         {
-            if (_breeder && _chicken)
-            {
-                _breeder.UnregisterChicken(_chicken);
-            }
+            if (!_breeder || !_chicken) return;
+            _breeder.UnregisterChicken(_chicken);
+            _chicken.AssignBreeder(null);
         }
     }
 }
