@@ -33,6 +33,7 @@ namespace AI.Chickens
         public Color nestSearchColor = Color.green;
         public float layEggDistance = 1f;
         public float incubateYOffset = 0.5f;
+        public float unfertilizedLayInterval = 60f;
         public LayerMask nestLayer;
         public bool IsPregnant => entity.Reproduction.IsPregnant;
         public ChickenState CurrentState { get; private set; } = ChickenState.Wander;
@@ -41,6 +42,9 @@ namespace AI.Chickens
         private bool _hasWanderDestination;
         private float _wanderTimer;
         private const float WanderInterval = 2f;
+
+        private float _unfertilizedTimer;
+        private bool _layUnfertilized;
 
         private const int NestOverlapMax = 30;
         private readonly Collider[] _overlapNestsBuffer = new Collider[NestOverlapMax];
@@ -65,30 +69,33 @@ namespace AI.Chickens
                 return;
             }
 
-            CurrentState = ChickenState.Wander; 
+            CurrentState = ChickenState.Wander;
 
             _breedingService = GameManager.Instance.BreedingService;
             if (!_breedingService)
                 Debug.LogError($"[ChickenAI:{name}] BreedingManager not found!", this);
-        } 
+
+            _unfertilizedTimer = unfertilizedLayInterval;
+            _layUnfertilized = false;
+        }
         protected override void StateTransition()
         {
             switch (CurrentState)
             {
                 case ChickenState.Wander:
-                    if (entity.Reproduction.IsPregnant)
+                    if (entity.Reproduction.IsPregnant || _layUnfertilized)
                     {
                         CurrentState = ChickenState.SeekNest;
                         _hasWanderDestination = false;
-                        agent.ResetPath(); 
+                        agent.ResetPath();
                     }
                     break;
 
-                case ChickenState.SeekNest: 
-                    if (!entity.Reproduction.IsPregnant)
+                case ChickenState.SeekNest:
+                    if (!entity.Reproduction.IsPregnant && !_layUnfertilized)
                     {
                         CurrentState = ChickenState.Wander;
-                        agent.ResetPath();  
+                        agent.ResetPath();
                     }
                     break;
 
@@ -125,6 +132,15 @@ namespace AI.Chickens
 
         private void DoWander()
         {
+            if (!entity.Reproduction.IsPregnant)
+            {
+                _unfertilizedTimer -= Time.deltaTime;
+                if (_unfertilizedTimer <= 0f)
+                {
+                    _layUnfertilized = true;
+                }
+            }
+
             _wanderTimer -= Time.deltaTime;
             if (!_hasWanderDestination || _wanderTimer <= 0f)
             {
@@ -204,16 +220,8 @@ namespace AI.Chickens
             }
         }
 
-          private void DoLayEgg()
-        { 
-            if (!entity.Reproduction.IsPregnant || !entity.Reproduction.PregnantBy)
-            {
-                Debug.LogWarning($"[ChickenAI:{name}] Cannot lay egg: not pregnant or no father.");
-                CurrentState = ChickenState.Wander;
-                agent.ResetPath();
-                return;
-            }
- 
+        private void DoLayEgg()
+        {
             if (!_targetNest)
             {
                 Debug.LogWarning($"[ChickenAI:{name}] Cannot lay egg: targetNest is null.");
@@ -221,27 +229,48 @@ namespace AI.Chickens
                 agent.ResetPath();
                 return;
             }
- 
-            var newEgg = _breedingService.SpawnEggAndAssignToNest(
-                entity, 
-                entity.Reproduction.PregnantBy, 
-                _targetNest
-            );
- 
-            entity.Reproduction.UnmarkPregnant();
-            Debug.Log($"[ChickenAI:{name}] Egg laid (netId={newEgg?.netId ?? 0}). Transitioning to Incubate.");
- 
-            _onNestEggHatchedHandler ??= OnNestEggHatched;
-            _targetNest.OnEggHatched += _onNestEggHatchedHandler;
- 
-            if (newEgg)
+
+            bool fertilized = entity.Reproduction.IsPregnant && entity.Reproduction.PregnantBy;
+            Egg newEgg;
+
+            if (fertilized)
             {
+                newEgg = _breedingService.SpawnEggAndAssignToNest(
+                    entity,
+                    entity.Reproduction.PregnantBy,
+                    _targetNest
+                );
+                entity.Reproduction.UnmarkPregnant();
+            }
+            else
+            {
+                newEgg = _breedingService.SpawnUnfertilizedEgg(entity, _targetNest);
+                _layUnfertilized = false;
+                _unfertilizedTimer = unfertilizedLayInterval;
+            }
+
+            if (!newEgg)
+            {
+                Debug.LogError($"[ChickenAI:{name}] Something went wrong: newEgg was null.");
+                CurrentState = ChickenState.Wander;
+                agent.ResetPath();
+                _targetNest = null;
+                return;
+            }
+
+            if (fertilized)
+            {
+                Debug.Log($"[ChickenAI:{name}] Egg laid (netId={newEgg.netId}). Transitioning to Incubate.");
+                _onNestEggHatchedHandler ??= OnNestEggHatched;
+                _targetNest.OnEggHatched += _onNestEggHatchedHandler;
                 newEgg.StartIncubation();
                 CurrentState = ChickenState.Incubate;
             }
             else
-            { 
-                Debug.LogError($"[ChickenAI:{name}] Something went wrong: newEgg was null.");
+            {
+                Debug.Log($"[ChickenAI:{name}] Unfertilized egg laid (netId={newEgg.netId}). Returning to Wander.");
+                entity.Reproduction.ClearNestReferences();
+                _targetNest = null;
                 CurrentState = ChickenState.Wander;
                 agent.ResetPath();
             }
