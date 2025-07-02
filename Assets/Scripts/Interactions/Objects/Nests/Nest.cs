@@ -6,12 +6,7 @@ using Mirror;
 using UnityEngine;
 
 namespace Interactions.Objects.Nests
-{
-    /// <summary>
-    /// Placed on any “nest” GameObject.  
-    /// Tracks which chicken has claimed it and which egg is inside.  
-    /// Provides explicit methods to assign or remove both chicken and egg.
-    /// </summary>
+{ 
     public class Nest : NetworkBehaviour
     {
         [SerializeField] private Transform spawnTransform;
@@ -26,52 +21,28 @@ namespace Interactions.Objects.Nests
         public HenEntity CurrentHen => _currentHen;
         public Egg CurrentEgg => _currentEgg; 
         public bool IsOccupied => _occupiedChickenNetId != 0 || _occupiedEggNetId != 0;
-
-        /// <summary>
-        /// Yumurtanın kuluçka süresi dolup hatch olduğunda
-        /// diğer sistemlerin (örn. ChickenAI) da haberdar olması için.
-        /// </summary>
+        
         public event Action<Nest> OnEggHatched;  // <<< **YENİ**
-
-        /// <summary>
-        /// Server-only: assign both chicken and egg to this nest.
-        /// (Yalnızca tavuğu atmak için kullanılıyordu; şimdi egg atma da ekleniyor.)
-        /// </summary>
+        
         [Server]
         public void Assign(uint henNetId)
         {
-            if (henNetId == 0)
+            if (henNetId == 0 || _occupiedChickenNetId != 0)
             {
-                Debug.LogError($"[Nest:{name}] Assign failed: invalid chickenNetId=0");
+                Debug.LogError($"[Nest:{name}] Assign failed: " +
+                               (henNetId == 0 ? "invalid chickenNetId=0" : $"nest already has chicken {_occupiedChickenNetId}"));
                 return;
             }
 
-            if (_occupiedChickenNetId != 0)
+            if (!NetworkServer.spawned.TryGetValue(henNetId, out var chObj) || !chObj.TryGetComponent(out HenEntity henEnt))
             {
-                Debug.LogError($"[Nest:{name}] Assign failed: nest already has chicken {_occupiedChickenNetId}");
-                return;
-            }
-
-            if (!NetworkServer.spawned.TryGetValue(henNetId, out var chObj))
-            {
-                Debug.LogError($"[Nest:{name}] Assign failed: chicken not found for netId={henNetId}");
-                return;
-            }
-            var henEnt = chObj.GetComponent<HenEntity>();
-            if (!henEnt)
-            {
-                Debug.LogError($"[Nest:{name}] Assign failed: object {henNetId} has no RoosterEntity");
+                Debug.LogError($"[Nest:{name}] Assign failed: object {henNetId} is not a valid HenEntity");
                 return;
             }
 
             _occupiedChickenNetId = henNetId;
-            _currentHen = henEnt;
-            henEnt.Reproduction.AssignNest(netId);
-        }
-
-        /// <summary>
-        /// Server-only: assign edilmiş bir egg objesini bu yuva üzerine yerleştirir.
-        /// </summary>
+            _currentHen = henEnt; 
+        }  
         [Server]
         public void AssignEgg(uint eggNetId)
         {
@@ -120,8 +91,8 @@ namespace Interactions.Objects.Nests
             if (_occupiedChickenNetId != 0 &&
                 NetworkServer.spawned.TryGetValue(_occupiedChickenNetId, out var chObj))
             {
-                var chickenEnt = chObj.GetComponent<RoosterEntity>();
-                chickenEnt?.Reproduction.ClearNestReferences();
+                var chickenEnt = chObj.GetComponent<HenEntity>();
+                chickenEnt?.NestHandler.UnassignNest();
             }
             _occupiedChickenNetId = 0;
             _currentHen = null; 
@@ -131,7 +102,7 @@ namespace Interactions.Objects.Nests
         [Server]
         public void ClearNest()
         { 
-            if (_currentEgg != null)
+            if (_currentEgg)
             {
                 _currentEgg.OnHatched -= HandleEggHatched;
             }

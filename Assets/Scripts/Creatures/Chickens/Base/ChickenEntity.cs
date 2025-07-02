@@ -4,8 +4,7 @@ using Creatures.Chickens.Base.Components;
 using Creatures.Chickens.Base.Utils;
 using Interactions.Objects.Breeders;
 using Mirror;
-using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine; 
 
 namespace Creatures.Chickens.Base
 {

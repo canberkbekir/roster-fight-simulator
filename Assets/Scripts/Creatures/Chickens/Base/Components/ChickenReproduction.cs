@@ -1,40 +1,15 @@
-﻿// RoosterReproduction.cs
-
-using AI.Chickens;
+﻿using AI.Chickens;
 using Creatures.Chickens.Roosters.Components;
-using Interactions.Objects.Nests;
 using Mirror;
-using UnityEngine;
 
 namespace Creatures.Chickens.Base.Components
 { 
     public class ChickenReproduction : ChickenComponentBase
     {
-        [SyncVar] private uint _currentNestNetId;
         [SyncVar] private uint _pregnantByNetId;
 
         [field: SyncVar]
-        public bool IsPregnant { get; private set; }
-
-        public Nest CurrentNest
-        {
-            get
-            {
-                if (_currentNestNetId == 0)
-                { 
-                    return null;
-                }
-
-                if (NetworkServer.spawned.TryGetValue(_currentNestNetId, out var nestObj))
-                {
-                    var nest = nestObj.GetComponent<Nest>(); 
-                    return nest;
-                }
- 
-                return null;
-            }
-        }
-
+        public bool IsPregnant { get; private set; } 
         public RoosterEntity PregnantBy
         {
             get
@@ -62,7 +37,6 @@ namespace Creatures.Chickens.Base.Components
             if (IsPregnant) return;
             IsPregnant = true; 
             _pregnantByNetId = fatherNetId;
-            _currentNestNetId = 0;  
         }
 
         [Server]
@@ -70,74 +44,12 @@ namespace Creatures.Chickens.Base.Components
         {
             if (!IsPregnant) return;
             IsPregnant = false;
-        }
-
-        [Server]
-        public void AssignNest(uint nestNetId)
-        {
-            _currentNestNetId = nestNetId;
-        }
-        
-        [Server]
-        public void UnassignNest()
-        {
-            if (_currentNestNetId == 0)
-            {
-                Debug.LogError($"[RoosterReproduction:{name}] UnassignNest failed: no current nest assigned.");
-                return;
-            }
-
-            _currentNestNetId = 0;
-        }
-
-        [Server]
-        public void ClearNestReferences()
-        {
-            IsPregnant = false;
-            _currentNestNetId = 0;
-        }
-
-        [Server]
-        public void SitOnEgg()
-        {
-            var nest = CurrentNest;
-            if (!nest)
-            {
-                Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: no current nest assigned.");
-                return;
-            }
-
-            if (nest.CurrentHen != Owner)
-            {
-                Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: current nest is occupied by another chicken.");
-                return;
-            }
-
-            if (!nest.CurrentEgg)
-            {
-                Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: no egg in the nest.");
-                return;
-            }
-
-            if (IsPregnant)
-            {
-                Debug.LogError($"[RoosterReproduction:{name}] SitOnEgg failed: already pregnant.");
-                return;
-            }
-        }
+        }  
 
         public override void OnStartServer()
         {
             base.OnStartServer(); 
-            if (_currentNestNetId == 0 || IsPregnant) return;
-            if (!NetworkServer.spawned.TryGetValue(_currentNestNetId, out var nestObj)) return;
-            var nest = nestObj.GetComponent<Nest>();
-            if (!nest || !nest.CurrentEgg) return;
-            var ai = Owner.ChickenAI as HenAI;
-            if (ai)
-                ai.ForceSetNestAndIncubate(nest);
-            else
-                SitOnEgg();
+            if (IsPregnant) return;   
         }
 
         #endregion 
@@ -172,7 +84,7 @@ namespace Creatures.Chickens.Base.Components
  
             maleSide.ForceResetToWander();
 
-            femaleSide.ForcePregnantSeekNest();
+            // femaleSide.ForcePregnantSeekNest();
  
             return true;
         }
@@ -186,14 +98,14 @@ namespace Creatures.Chickens.Base.Components
             if (ai != null)
                 ai.ForceToWander();
         }
-
-        [Server]
-        public void ForcePregnantSeekNest()
-        {
-            var ai = Owner.GetComponent<HenAI>();
-            if (ai != null)
-                ai.ForceSetPregnantSeekNest();
-        }
+        //
+        // [Server]
+        // public void ForcePregnantSeekNest()
+        // {
+        //     var ai = Owner.GetComponent<HenAI>();
+        //     if (ai != null)
+        //         ai.ForceSetPregnantSeekNest();
+        // }
 
         #endregion
     }

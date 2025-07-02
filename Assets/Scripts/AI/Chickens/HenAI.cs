@@ -5,10 +5,7 @@ using Interactions.Objects.Nests;
 using Managers;
 using Mirror;
 using Services;
-using UnityEngine;
-using UnityEngine.AI;
-using Utils;
-using Random = UnityEngine.Random;
+using UnityEngine; 
 
 namespace AI.Chickens
 {
@@ -105,169 +102,21 @@ namespace AI.Chickens
             switch (CurrentState)
             {
                 case ChickenState.Wander:
-                    DoWander();
+                    // DoWander();
                     break;
                 case ChickenState.SeekNest:
-                    DoSeekNest();
+                    // DoSeekNest();
                     break;
                 case ChickenState.LayEgg:
-                    DoLayEgg();
+                    // DoLayEgg();
                     break;
                 case ChickenState.Incubate:
-                    DoIncubate();
+                    // DoIncubate();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        #region State Behaviors
-
-        private void DoWander()
-        {
-            _wanderTimer -= Time.deltaTime;
-            if (!_hasWanderDestination || _wanderTimer <= 0f)
-            {
-                var randomDir = Random.insideUnitSphere * wanderRadius + transform.position;
-                if (NavMesh.SamplePosition(randomDir, out var hit, wanderRadius, NavMesh.AllAreas))
-                {
-                    _wanderDestination = hit.position;
-                    _hasWanderDestination = true;
-                    _wanderTimer = WanderInterval;
-                    MoveTo(_wanderDestination);
-                }
-                else
-                {
-                    _hasWanderDestination = false;
-                    _wanderTimer = 0.1f;
-                    agent.ResetPath();
-                }
-            }
-            else if (HasReached(_wanderDestination))
-            {
-                _hasWanderDestination = false;
-            }
-        }
-
-        private void DoSeekNest()
-        {
-            if (!_targetNest)
-            {
-                var count = Physics.OverlapSphereNonAlloc(transform.position, nestSearchRadius, _overlapNestsBuffer);
-                var bestDist = float.MaxValue;
-                Nest bestNest = null;
-
-                for (var i = 0; i < count; i++)
-                {
-                    var col = _overlapNestsBuffer[i];
-                    if (!nestLayer.Contains(col.gameObject.layer)) continue;
-
-                    var nestComp = col.GetComponent<Nest>();
-                    if (!nestComp || nestComp.CurrentHen) continue;
-
-                    var d = Vector3.Distance(transform.position, col.transform.position);
-                    if (!(d < bestDist)) continue;
-                    bestDist = d;
-                    bestNest = nestComp;
-                }
-
-                if (bestNest)
-                {
-                    bestNest.Assign(entity.netId);
-                    _targetNest = bestNest; 
-                }
-                else
-                {
-                    CurrentState = ChickenState.Wander;
-                    agent.ResetPath();
-                    _hasWanderDestination = false;
-                    return;
-                }
-            }
-
-            if (_targetNest && NetworkServer.spawned.TryGetValue(_targetNest.netId, out var nestObj))
-            {
-                var nestPos = nestObj.transform.position;
-                MoveTo(nestPos);
-
-                if (!(Vector3.Distance(transform.position, nestPos) <= layEggDistance)) return;
-                CurrentState = ChickenState.LayEgg;
-                agent.ResetPath();
-            }
-            else
-            {
-                entity.Reproduction.AssignNest(0);
-                _targetNest = null;
-                CurrentState = ChickenState.Wander;
-                agent.ResetPath();
-                _hasWanderDestination = false;
-            }
-        }
-
-          private void DoLayEgg()
-        { 
-            if (!entity.Reproduction.IsPregnant || !entity.Reproduction.PregnantBy)
-            {
-                Debug.LogWarning($"[ChickenAI:{name}] Cannot lay egg: not pregnant or no father.");
-                CurrentState = ChickenState.Wander;
-                agent.ResetPath();
-                return;
-            }
- 
-            if (!_targetNest)
-            {
-                Debug.LogWarning($"[ChickenAI:{name}] Cannot lay egg: targetNest is null.");
-                CurrentState = ChickenState.Wander;
-                agent.ResetPath();
-                return;
-            }
- 
-            var newEgg = _breedingService.SpawnEggAndAssignToNest(
-                entity, 
-                entity.Reproduction.PregnantBy, 
-                _targetNest
-            );
- 
-            entity.Reproduction.UnmarkPregnant();
-            Debug.Log($"[ChickenAI:{name}] Egg laid (netId={newEgg?.netId ?? 0}). Transitioning to Incubate.");
- 
-            _onNestEggHatchedHandler ??= OnNestEggHatched;
-            _targetNest.OnEggHatched += _onNestEggHatchedHandler;
- 
-            if (newEgg)
-            {
-                newEgg.StartIncubation();
-                CurrentState = ChickenState.Incubate;
-            }
-            else
-            { 
-                Debug.LogError($"[ChickenAI:{name}] Something went wrong: newEgg was null.");
-                CurrentState = ChickenState.Wander;
-                agent.ResetPath();
-            }
-        }
-
-        private void DoIncubate()
-        { 
-            if (!_targetNest || !_targetNest.CurrentEgg)
-            {
-                CurrentState = ChickenState.Wander;
-                agent.ResetPath();
-                return;
-            }
- 
-            var dist = Vector3.Distance(transform.position, _targetNest.transform.position);
-            if (dist > layEggDistance)
-            {
-                MoveTo(_targetNest.transform.position);
-                return;
-            }
- 
-            entity.Reproduction.SitOnEgg();
-            transform.position = _targetNest.transform.position + new Vector3(0f, incubateYOffset, 0f);
-        }
-
-        #endregion 
         
         [Server]
         private void OnNestEggHatched(Nest nest)
@@ -280,48 +129,7 @@ namespace AI.Chickens
             agent.ResetPath();
         }
  
-        [Server]
-        public void ForceSetNestAndIncubate(Nest nest)
-        {
-            if (!nest)
-                return;
-
-            _targetNest = nest;
-            entity.Reproduction.AssignNest(nest.netId);
- 
-            if (nest.CurrentEgg)
-            {
-                CurrentState = ChickenState.Incubate;
-                agent.ResetPath();
- 
-                _onNestEggHatchedHandler ??= OnNestEggHatched;
-                nest.OnEggHatched += _onNestEggHatchedHandler;
- 
-                entity.Reproduction.SitOnEgg();
-                transform.position = nest.transform.position + new Vector3(0f, incubateYOffset, 0f);
- 
-                var eggComponent = nest.CurrentEgg;
-                if (eggComponent && !eggComponent.isIncubating)
-                {
-                    eggComponent.StartIncubation();
-                }
-            }
-            else
-            { 
-                CurrentState = ChickenState.Wander;
-                agent.ResetPath();
-                _hasWanderDestination = false;
-            }
-        }
-
-        [Server]
-        public void ForceSetPregnantSeekNest()
-        {
-            CurrentState = ChickenState.SeekNest;
-            _hasWanderDestination = false;
-            _targetNest = null;
-            agent.ResetPath(); 
-        }
+        
          
         private void OnDrawGizmosSelected()
         {
