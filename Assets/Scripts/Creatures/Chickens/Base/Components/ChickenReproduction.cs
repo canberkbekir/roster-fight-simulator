@@ -13,11 +13,6 @@ namespace Creatures.Chickens.Base.Components
         [SyncVar] private uint _currentNestNetId;
         [SyncVar] private uint _pregnantByNetId;
 
-        public override void Init(ChickenEntity owner)
-        {
-            base.Init(owner);
-        }
-
         [field: SyncVar]
         public bool IsPregnant { get; private set; }
 

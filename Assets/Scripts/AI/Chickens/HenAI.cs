@@ -1,6 +1,4 @@
-﻿// ChickenAI.cs
-
-using System;
+﻿using System;
 using AI.Base;
 using Creatures.Chickens.Hens.Components;
 using Interactions.Objects.Nests;
@@ -16,7 +14,6 @@ namespace AI.Chickens
 {
     public enum ChickenState
     {
-        Idle,
         Wander,
         SeekNest,
         LayEgg,
@@ -61,7 +58,7 @@ namespace AI.Chickens
                 return;
             } 
             
-            if (entity == null)
+            if (!entity)
             {
                 Debug.LogError($"[ChickenAI:{name}] Missing RoosterEntity!", this);
                 enabled = false;
@@ -71,7 +68,7 @@ namespace AI.Chickens
             CurrentState = ChickenState.Wander; 
 
             _breedingService = GameManager.Instance.BreedingService;
-            if (_breedingService == null)
+            if (!_breedingService)
                 Debug.LogError($"[ChickenAI:{name}] BreedingManager not found!", this);
         } 
         protected override void StateTransition()
@@ -98,12 +95,6 @@ namespace AI.Chickens
                 case ChickenState.LayEgg:
                 case ChickenState.Incubate:
                     break;
-
-                case ChickenState.Idle:
-                    CurrentState = ChickenState.Wander;
-                    agent.ResetPath(); 
-                    break;
-
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -124,9 +115,6 @@ namespace AI.Chickens
                     break;
                 case ChickenState.Incubate:
                     DoIncubate();
-                    break;
-                case ChickenState.Idle:
-                    agent.ResetPath();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -186,8 +174,7 @@ namespace AI.Chickens
                 if (bestNest)
                 {
                     bestNest.Assign(entity.netId);
-                    _targetNest = bestNest;
-                    entity.Reproduction.AssignNest(bestNest.netId);
+                    _targetNest = bestNest; 
                 }
                 else
                 {
