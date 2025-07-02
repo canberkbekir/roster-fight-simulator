@@ -2,6 +2,7 @@ using System;
 using AI.Base;
 using Creatures.Chickens.Base.Components;
 using Creatures.Chickens.Base.Utils;
+using Interactions.Objects.Breeders;
 using Mirror;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -35,6 +36,35 @@ namespace Creatures.Chickens.Base
         public ChickenEventBus EventBus { get; protected set; }
         public Chicken Chicken { get; protected set; }
         public BaseAI ChickenAI => ai;
+
+        [SyncVar] private uint _breederNetId;
+
+        public Breeder Breeder
+        {
+            get
+            {
+                if (_breederNetId == 0) return null;
+
+                if (isServer)
+                {
+                    if (NetworkServer.spawned.TryGetValue(_breederNetId, out var obj))
+                        return obj.GetComponent<Breeder>();
+                }
+                else if (isClient)
+                {
+                    if (NetworkClient.spawned.TryGetValue(_breederNetId, out var obj))
+                        return obj.GetComponent<Breeder>();
+                }
+
+                return null;
+            }
+        }
+
+        [Server]
+        public void AssignBreeder(Breeder breeder)
+        {
+            _breederNetId = breeder ? breeder.netId : 0;
+        }
         
         private bool _isInitialized;
         
