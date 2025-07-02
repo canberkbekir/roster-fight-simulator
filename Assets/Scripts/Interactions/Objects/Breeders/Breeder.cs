@@ -125,8 +125,9 @@ namespace Interactions.Objects.Breeders
         private void SpawnChicken(PlayerInventory inventory, Chicken chickenData, Vector3 position)
         {
             var entity = _spawnerService.SpawnChickenServer(position, chickenData);
-            if (!entity) return; 
+            if (!entity) return;
 
+            entity.AssignBreeder(this);
             _spawnedChickens.Add(entity);
 
             var tracker = entity.gameObject.AddComponent<BreederChickenTracker>();
