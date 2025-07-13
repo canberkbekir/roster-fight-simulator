@@ -1,6 +1,8 @@
 using Creatures.Chickens.Base;
 using System.Collections.Generic;
+using System.Linq;
 using Interactions.Base;
+using Interactions.Objects.Nests;
 using InventorySystem.Base;
 using Managers;
 using Mirror;
@@ -17,8 +19,10 @@ namespace Interactions.Objects.Breeders
         [Header("Settings")]
         [Tooltip("Maximum number of chickens this breeder can hold")]
         [SerializeField] private int maxChickens = 10;
- 
-
+        
+        [Space]
+        [Header("References")]
+        [SerializeField] private Nest[] nests; 
         #endregion
 
         #region Private Fields
@@ -34,7 +38,8 @@ namespace Interactions.Objects.Breeders
         /// Gets currently spawned chickens.
         /// </summary>
         public IReadOnlyList<ChickenEntity> CurrentChickens => _spawnedChickens.AsReadOnly();
-
+        public int MaxChickens => maxChickens;
+        public Nest[] Nests => nests;
         #endregion
 
         #region Unity Callbacks
@@ -51,12 +56,6 @@ namespace Interactions.Objects.Breeders
         #endregion
 
         #region Interaction
-
-        /// <summary>
-        /// Called when player interacts with breeder.
-        /// Attempts to spawn a chicken if conditions are met.
-        /// </summary>
-        /// <param name="interactor">Player game object</param>
         public override void OnInteract(GameObject interactor)
         {
             base.OnInteract(interactor);
@@ -170,6 +169,12 @@ namespace Interactions.Objects.Breeders
             if (_spawnedChickens.Contains(entity))
                 _spawnedChickens.Remove(entity);
         }
+        
+        [Server]
+        public Nest[] GetAvailableNests()
+        {
+            return nests.Where(nest => !nest.IsOccupied).ToArray();
+        } 
 
         #endregion
     }

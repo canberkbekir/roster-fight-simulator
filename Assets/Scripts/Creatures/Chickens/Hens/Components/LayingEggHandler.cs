@@ -1,8 +1,5 @@
 using Creatures.Chickens.Base;
-using Creatures.Chickens.Base.Components;
-using Interactions.Objects.Nests;
-using Mirror;
-using UnityEngine;
+using Creatures.Chickens.Base.Components; 
 
 namespace Creatures.Chickens.Hens.Components
 {

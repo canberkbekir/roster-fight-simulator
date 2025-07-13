@@ -222,6 +222,53 @@ MonoBehaviour:
   syncInterval: 0
   bodyPartType: 0
   partRenderer: {fileID: 444869691022592335}
+--- !u!1 &2483608479017355395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4859101557109009990}
+  - component: {fileID: 7105148152980446521}
+  m_Layer: 9
+  m_Name: LayingEggHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4859101557109009990
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483608479017355395}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5689943460716717034}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7105148152980446521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483608479017355395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7265ab2b61d4a35aee99f7b65d5e862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &3340948639684696880
 GameObject:
   m_ObjectHideFlags: 0
@@ -1344,6 +1391,54 @@ Transform:
   - {fileID: 4446985172488327977}
   m_Father: {fileID: 1759013288314928208}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7825938214733640763
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2418539263830187875}
+  - component: {fileID: 8934860255333221563}
+  m_Layer: 9
+  m_Name: NestHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2418539263830187875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7825938214733640763}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5689943460716717034}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8934860255333221563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7825938214733640763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d98078f505444ad88687cc071e4376cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  assignedNestUid: 0
 --- !u!1 &8013811881738790394
 GameObject:
   m_ObjectHideFlags: 0
@@ -1394,6 +1489,8 @@ MonoBehaviour:
   syncInterval: 0
   tickInterval: 1
   agent: {fileID: 6740957189236644145}
+  tickCooldown:
+    duration: 0
   entity: {fileID: 7564526547738146755}
   wanderRadius: 3
   wanderColor: {r: 0, g: 0, b: 1, a: 1}
@@ -1709,6 +1806,8 @@ MonoBehaviour:
   equipment: {fileID: 1969164283772462624}
   reproduction: {fileID: 8258850294865288350}
   ai: {fileID: 959944817670358597}
+  layingEggHandler: {fileID: 7105148152980446521}
+  nestHandler: {fileID: 8934860255333221563}
 --- !u!114 &3575680096342574043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1761,6 +1860,8 @@ Transform:
   - {fileID: 176423796149234442}
   - {fileID: 5701358962334392765}
   - {fileID: 723557954320238816}
+  - {fileID: 4859101557109009990}
+  - {fileID: 2418539263830187875}
   m_Father: {fileID: 9089817972910106211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8288628166702953548
