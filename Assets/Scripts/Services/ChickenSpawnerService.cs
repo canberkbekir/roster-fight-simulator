@@ -424,7 +424,7 @@ namespace Services
                 throw new ArgumentException("Genes cannot be null.", nameof(genes));
             
             var chickData = new Chick();
-            chickData.Genes = chickData.Genes.Select(g =>
+            chickData.Genes = genes.Select(g =>
             {
                 var data = geneDataContainer.GetGeneById(g.GeneId)
                            ?? throw new ArgumentException($"Gene ID {g.GeneId} not found.");
