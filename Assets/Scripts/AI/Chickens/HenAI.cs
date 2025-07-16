@@ -39,7 +39,7 @@ namespace AI.Chickens
         [SerializeField] private float layEggDistance = 1f;
         [SerializeField] private float incubateYOffset = 0.5f;
 
-        private BreedingService _breedingService;
+        private ReproductionService _reproductionService;
         private Nest _targetNest;
         private NavMeshAgent _agent;
 
@@ -58,9 +58,9 @@ namespace AI.Chickens
                 return;
             }
 
-            _breedingService = GameManager.Instance.BreedingService;
-            if (_breedingService == null)
-                Debug.LogError("[HenAI] BreedingService not found!", this);
+            _reproductionService = GameManager.Instance.ReproductionService;
+            if (_reproductionService == null)
+                Debug.LogError("[HenAI] ReproductionService not found!", this);
 
             _agent = GetComponent<NavMeshAgent>(); 
             OnEnterState(_currentState);

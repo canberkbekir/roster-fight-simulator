@@ -41,11 +41,11 @@ namespace Creatures.Chickens.Hens.Components
         public event Action OnEggLaid;
 
         
-        private BreedingService _breedingService;
+        private ReproductionService _reproductionService;
 
         private void Awake()
         {
-            _breedingService = GameManager.Instance.BreedingService;
+            _reproductionService = GameManager.Instance.ReproductionService;
         }
 
         public void Init(ChickenEntity newOwner)

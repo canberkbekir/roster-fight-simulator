@@ -16,8 +16,9 @@ namespace Managers
         [Header("Managers")]
         [SerializeField] private ChickenSpawnerService chickenSpawnerService;
         [FormerlySerializedAs("containerManager")] [SerializeField] private ContainerService containerService;
-        [FormerlySerializedAs("eggManager")] [SerializeField] private EggService eggService;
-        [FormerlySerializedAs("breedingManager")] [SerializeField] private BreedingService breedingService; 
+        [FormerlySerializedAs("eggManager")]
+        [FormerlySerializedAs("breedingManager")]
+        [SerializeField] private ReproductionService reproductionService;
         [SerializeField] private DayNightManager dayNightManager;
         
         [Space]
@@ -31,8 +32,7 @@ namespace Managers
         // Properties for Managers
         public ChickenSpawnerService ChickenSpawnerService => chickenSpawnerService;
         public ContainerService ContainerService => containerService;
-        public EggService EggService => eggService;
-        public BreedingService BreedingService => breedingService; 
+        public ReproductionService ReproductionService => reproductionService;
         public DayNightManager DayNightManager => dayNightManager;
         
         // Property for References
