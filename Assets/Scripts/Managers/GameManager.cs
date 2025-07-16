@@ -10,14 +10,9 @@ namespace Managers
     public class GameManager : NetworkBehaviour
     { 
         public static GameManager Instance { get; private set; }
-        
-        [FormerlySerializedAs("chickenSpawnerManager")]
-        [FormerlySerializedAs("roosterSpawnerManager")]
         [Header("Managers")]
         [SerializeField] private ChickenSpawnerService chickenSpawnerService;
-        [FormerlySerializedAs("containerManager")] [SerializeField] private ContainerService containerService;
-        [FormerlySerializedAs("eggManager")]
-        [FormerlySerializedAs("breedingManager")]
+        [SerializeField] private ContainerService containerService;
         [SerializeField] private ReproductionService reproductionService;
         [SerializeField] private DayNightManager dayNightManager;
         

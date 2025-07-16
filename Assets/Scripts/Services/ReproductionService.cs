@@ -14,18 +14,9 @@ namespace Services
         [Header("Egg Settings")]
         [Tooltip("Drag in your Egg prefab here. It must have an `Egg` component on it.")]
         [SerializeField] private GameObject eggPrefab;
-
-        public static ReproductionService Instance { get; private set; }
-
+        
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-
             if (eggPrefab == null)
                 Debug.LogError("[ReproductionService] eggPrefab is not assigned in the inspector.");
         }
