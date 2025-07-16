@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Creatures.Chickens.Hens.Components
 {
-    public class NestHandler : ChickenComponentBase
+    public class HenNestHandler : ChickenComponentBase
     {
         [Header("Settings")]
         [SerializeField] private uint assignedNestUid;

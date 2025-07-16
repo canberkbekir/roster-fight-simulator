@@ -52,7 +52,7 @@ namespace Creatures.Chickens.Chicks.Components
         }
 
         [ServerCallback]
-        public void OnDestroy()
+        protected override void OnDestroy()
         {
             if (growthCooldown != null)
             {

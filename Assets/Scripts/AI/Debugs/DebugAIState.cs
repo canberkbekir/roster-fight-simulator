@@ -32,7 +32,7 @@ namespace AI.Debugs
             }
             else if (henAI)
             {
-                stateText.text = $"{henAI.CurrentState}";
+                stateText.text = $"{henAI.Entity.CurrentState}";
             }
             else if (chickAI)
             {

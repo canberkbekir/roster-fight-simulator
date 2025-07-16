@@ -188,7 +188,7 @@ namespace AI.Chickens
                     continue;
                 
                 var chickenAI = chickenEnt.ChickenAI as HenAI;
-                if (!chickenAI || chickenAI.CurrentState != ChickenState.Wander)
+                if (!chickenAI || chickenAI.Entity.CurrentState != HenState.Wander)
                     continue; 
 
                 _targetChicken = chickenEnt;

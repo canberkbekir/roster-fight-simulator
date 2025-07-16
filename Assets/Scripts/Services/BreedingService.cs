@@ -1,15 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Creatures.Chickens.Eggs;
+﻿using Creatures.Chickens.Eggs;
 using Creatures.Chickens.Hens.Components;
-using Creatures.Chickens.Roosters.Components;
-using Creatures.Genes;
-using Creatures.Genes.Base;
+using Creatures.Chickens.Roosters.Components; 
 using Creatures.Genes.Base.ScriptableObjects;
 using Interactions.Objects.Nests;
 using Managers;
 using Mirror;
 using UnityEngine;
+using Utils; 
 
 namespace Services
 {
@@ -42,12 +39,14 @@ namespace Services
                 return null;
             }
  
-            var mixed = CrossGenes(
+            var mixed = GeneHelper.CrossGenes(
                 mother.Chicken.Genes,
                 father.Chicken.Genes
             );
+            
+            var mixedSync = GeneHelper.GeneToGeneSync(mixed);
  
-            var newEggNetId = _eggService.SpawnEggWithGenes(nest, mixed);
+            var newEggNetId = _eggService.SpawnEggWithGenes(nest, mixedSync);
             if (newEggNetId == 0)
             {
                 Debug.LogError("[BreedingManager] Failed to spawn egg via EggManager.");
@@ -61,30 +60,32 @@ namespace Services
             }
             return spawnedEgg;
         }
- 
-        public static GeneSync[] CrossGenes(Gene[] momGenes, Gene[] dadGenes)
+
+        [Server]
+        public Egg SpawnEggAndAssignToNest(HenEntity mother, Nest nest)
         {
-            var lookup = new Dictionary<int, Gene>();
-
-            foreach (var gm in momGenes)
+            if (!mother || !nest)
             {
-                lookup[gm.GeneId] = gm;
+                Debug.LogError("[BreedingManager] SpawnEggAndAssignToNest: one argument was null.");
+                return null;
             }
 
-            foreach (var gf in dadGenes)
+            var passedGene = GeneHelper.GetPassedGene(mother.Chicken.Genes);
+            var passedGeneSync = GeneHelper.GeneToGeneSync(passedGene); 
+ 
+            var newEggNetId = _eggService.SpawnEggWithGenes(nest, passedGeneSync);
+            if (newEggNetId == 0)
             {
-                if (!lookup.ContainsKey(gf.GeneId))
-                {
-                    lookup[gf.GeneId] = gf;
-                }
-                else
-                {
-                    var chosen = (Random.value < 0.5f) ? lookup[gf.GeneId] : gf;
-                    lookup[gf.GeneId] = chosen;
-                }
+                Debug.LogError("[BreedingManager] Failed to spawn egg via EggManager.");
+                return null;
             }
-
-            return lookup.Select(kvp => new GeneSync(kvp.Value)).ToArray();
-        }
+ 
+            var spawnedEgg = nest.CurrentEgg;
+            if (spawnedEgg == null)
+            {
+                Debug.LogError("[BreedingManager] After spawning, nest.CurrentEgg is still null!");
+            }
+            return spawnedEgg;
+        }   
     }
 }

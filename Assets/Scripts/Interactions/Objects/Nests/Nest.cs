@@ -92,7 +92,7 @@ namespace Interactions.Objects.Nests
                 NetworkServer.spawned.TryGetValue(_occupiedChickenNetId, out var chObj))
             {
                 var chickenEnt = chObj.GetComponent<HenEntity>();
-                chickenEnt?.NestHandler.UnassignNest();
+                chickenEnt?.HenNestHandler.UnassignNest();
             }
             _occupiedChickenNetId = 0;
             _currentHen = null; 
