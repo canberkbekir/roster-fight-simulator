@@ -2,44 +2,36 @@ using System;
 using Mirror;
 using UnityEngine;
 using Creatures.Chickens.Base;
+using Creatures.Chickens.Base.Components;
+using Creatures.Chickens.Eggs;
+using Creatures.Chickens.Roosters.Components;
 using Interactions.Objects.Nests;
 using Managers;
 using Services;
 
 namespace Creatures.Chickens.Hens.Components
 {
-    /// <summary>
-    /// Server‑authoritative egg formation using delta‑time in Update,
-    /// fires an event when done.
-    /// </summary>
-    public class HenEggHandler : NetworkBehaviour
+    public class HenEggHandler : ChickenComponentBase
     {
         [Header("Egg Timing")]
         [Tooltip("Seconds required to form one egg.")]
         [SerializeField] private float eggFormationDuration = 15f;
 
-        // 0…eggFormationDuration, synced to clients
         [SyncVar] private float progressTime;
         [SyncVar] private bool isProgressing;
+        [SyncVar] private bool isEggFertilized;
         [SyncVar] private bool eggReady;
-
-        /// <summary>
-        /// Normalized [0…1] progress for UI binding.
-        /// </summary>
+        [SyncVar] private RoosterEntity fertilizedBy;
+        [SyncVar] private EggEntity _layedEggEntity;
+        
+        public EggEntity LayedEggEntity => _layedEggEntity;
         public float Progress => Mathf.Clamp01(progressTime / eggFormationDuration);
-
-        /// <summary>
-        /// True once the timer has elapsed.  You can poll this
-        /// and then call your own LayEggAt(...) or whatever.
-        /// </summary>
         public bool IsEggReady => eggReady;
-
-        /// <summary>
-        /// Fired on the server when an egg is fully formed.
-        /// </summary>
+        
         public event Action OnEggFormed;
         public event Action OnEggLaid;
-
+        public event Action<RoosterEntity> OnEggFertilized;
+        
         
         private ReproductionService _reproductionService;
 
@@ -48,9 +40,9 @@ namespace Creatures.Chickens.Hens.Components
             _reproductionService = GameManager.Instance.ReproductionService;
         }
 
-        public void Init(ChickenEntity newOwner)
+        public override void Init(ChickenEntity owner)
         {
-            // owner reference if you need it later
+            base.Init(owner);
             ResetProgress();
         }
 
@@ -82,7 +74,11 @@ namespace Creatures.Chickens.Hens.Components
         {
             isProgressing = false;
             eggReady      = false;
+            isEggFertilized = false;
             progressTime  = 0f;
+            fertilizedBy  = null;
+            
+            StartProgress();
         }
 
         [Server]
@@ -94,13 +90,31 @@ namespace Creatures.Chickens.Hens.Components
                 return;
             }
 
-            // Lay the egg at the nest's position
-            // nest.AssignEgg();
+            if (isEggFertilized)
+            {
+               _layedEggEntity = _reproductionService.LayFertilizedEgg(Owner as HenEntity, fertilizedBy, nest);
+            }
+            else
+            { 
+                _layedEggEntity = _reproductionService.LayUnfertilizedEgg(Owner as HenEntity, nest);
+            }
             OnEggLaid?.Invoke();
-
-            // Reset progress after laying the egg
             ResetProgress();
-            
+        }
+        
+        [Server]
+        public void FertilizeEgg(RoosterEntity rooster)
+        {
+            if (rooster == null)
+            {
+                Debug.LogError("Cannot fertilize egg: Rooster is null.");
+                return;
+            }
+
+            isEggFertilized = true;
+            fertilizedBy    = rooster;
+
+            OnEggFertilized?.Invoke(fertilizedBy);
         }
 
         [Server]

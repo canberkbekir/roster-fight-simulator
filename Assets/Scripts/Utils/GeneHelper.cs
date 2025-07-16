@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Creatures.Genes;
 using Creatures.Genes.Base;
+using Managers;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Utils
 {
-    public class GeneHelper
+    public static class GeneHelper
     {
-        public static Gene[] CrossGenes(Gene[] motherGene, Gene[] fatherGene)
+        public static Gene[] GetCrossGenes(Gene[] motherGene, Gene[] fatherGene)
         {
             if (motherGene == null || fatherGene == null)
             {
@@ -50,6 +52,41 @@ namespace Utils
             }
 
             return genes.Select(g => new GeneSync(g)).ToArray();
+        }
+
+        public static Gene[] GeneSyncToGene(GeneSync[] geneSyncs)
+        {
+            var geneContainer = GameManager.Instance.ContainerService.GeneDataContainer;
+            if (geneSyncs == null || geneSyncs.Length == 0)
+            {
+                return Array.Empty<Gene>();
+            }
+            
+            var geneList = new List<Gene>();
+            foreach (var geneSync in geneSyncs)
+            {
+                var geneData = geneContainer.GetGeneById(geneSync.id);
+                if (geneData != null)
+                {
+                    
+                    geneList.Add(new Gene(geneData));
+                }
+                else
+                {
+                    Debug.LogWarning($"Gene with ID {geneSync.id} not found in GeneDataContainer.");
+                }
+            }
+
+            return geneList.ToArray();
+        }
+    }
+    
+    public static class GeneExtensions
+    {
+        public static Gene ApplyChance(this Gene g, float chance)
+        {
+            g.OverridePassingChance(chance);
+            return g;
         }
     }
 }

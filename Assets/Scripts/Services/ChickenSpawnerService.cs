@@ -12,7 +12,9 @@ using Creatures.Genes;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
 using Mirror;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Services
 {
@@ -22,7 +24,7 @@ namespace Services
 
         [SerializeField] private GeneDataContainer geneDataContainer;
         [SerializeField] private GameObject roosterEntityPrefab;
-        [SerializeField] private GameObject chickenEntityPrefab;
+        [SerializeField] private GameObject henEntityPrefab;
         [SerializeField] private GameObject chickEntityPrefab;
 
         #endregion
@@ -146,6 +148,15 @@ namespace Services
         {
             var rot = spawnRot ?? Quaternion.identity;
             var entity = CreateChickEntity(chickData);
+            SpawnEntityInternal(entity, spawnPos, rot, null);
+            return entity;
+        }
+
+        [Server]
+        public ChickEntity SpawnChickFromEggServer(Vector3 spawnPos, Gene[] genes, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            var entity = CreateChickEntity(genes);
             SpawnEntityInternal(entity, spawnPos, rot, null);
             return entity;
         }
@@ -343,13 +354,13 @@ namespace Services
 
         private HenEntity CreateHenEntity(GeneData geneData)
         {
-            if (chickenEntityPrefab == null)
+            if (henEntityPrefab == null)
                 throw new UnassignedReferenceException("chickenEntityPrefab must be assigned.");
 
-            var go = Instantiate(chickenEntityPrefab);
+            var go = Instantiate(henEntityPrefab);
             var ent = go.GetComponent<HenEntity>();
             if (ent == null)
-                throw new MissingComponentException($"Prefab '{chickenEntityPrefab.name}' lacks RoosterEntity.");
+                throw new MissingComponentException($"Prefab '{henEntityPrefab.name}' lacks RoosterEntity.");
 
             var chicken = new Hen { Genes = new[] { new Gene(geneData) } };
             ent.Init(chicken);
@@ -358,7 +369,7 @@ namespace Services
 
         private HenEntity CreateHenEntity(Hen henData)
         {
-            if (chickenEntityPrefab == null)
+            if (henEntityPrefab == null)
                 throw new UnassignedReferenceException("chickenEntityPrefab must be assigned.");
 
             if (henData == null)
@@ -370,10 +381,10 @@ namespace Services
                            ?? throw new ArgumentException($"Gene ID {g.GeneId} not found.");
                 return new Gene(data);
             }).ToArray(); 
-            var go = Instantiate(chickenEntityPrefab);
+            var go = Instantiate(henEntityPrefab);
             var ent = go.GetComponent<HenEntity>();
             if (ent == null)
-                throw new MissingComponentException($"Prefab '{chickenEntityPrefab.name}' lacks RoosterEntity.");
+                throw new MissingComponentException($"Prefab '{henEntityPrefab.name}' lacks RoosterEntity.");
 
             ent.Init(henData);
             return ent;
@@ -395,6 +406,31 @@ namespace Services
             }).ToArray();
 
             // Gender may already be set on chickData
+            var go = Instantiate(chickEntityPrefab);
+            var ent = go.GetComponent<ChickEntity>();
+            if (ent == null)
+                throw new MissingComponentException($"Prefab '{chickEntityPrefab.name}' lacks ChickEntity.");
+
+            ent.Init(chickData);
+            return ent;
+        }
+
+        private ChickEntity CreateChickEntity(Gene[] genes)
+        {
+            if (!chickEntityPrefab)
+                throw new UnassignedReferenceException("chickEntityPrefab must be assigned.");
+
+            if (genes == null )                
+                throw new ArgumentException("Genes cannot be null.", nameof(genes));
+            
+            var chickData = new Chick();
+            chickData.Genes = chickData.Genes.Select(g =>
+            {
+                var data = geneDataContainer.GetGeneById(g.GeneId)
+                           ?? throw new ArgumentException($"Gene ID {g.GeneId} not found.");
+                return new Gene(data);
+            }).ToArray();
+            
             var go = Instantiate(chickEntityPrefab);
             var ent = go.GetComponent<ChickEntity>();
             if (ent == null)

@@ -15,11 +15,11 @@ namespace Interactions.Objects.Nests
         [SyncVar] private uint _occupiedEggNetId = 0;
 
         private HenEntity _currentHen;
-        private Egg _currentEgg;
+        private EggEntity _currentEggEntity;
 
         public Transform SpawnTransform => spawnTransform;
         public HenEntity CurrentHen => _currentHen;
-        public Egg CurrentEgg => _currentEgg; 
+        public EggEntity CurrentEggEntity => _currentEggEntity; 
         public bool IsOccupied => _occupiedChickenNetId != 0 || _occupiedEggNetId != 0;
         
         public event Action<Nest> OnEggHatched;  // <<< **YENİ**
@@ -63,7 +63,7 @@ namespace Interactions.Objects.Nests
                 Debug.LogError($"[Nest:{name}] AssignEgg failed: egg not found for netId={eggNetId}");
                 return;
             }
-            var eggComp = eggObj.GetComponent<Egg>();
+            var eggComp = eggObj.GetComponent<EggEntity>();
             if (!eggComp)
             {
                 Debug.LogError($"[Nest:{name}] AssignEgg failed: object {eggNetId} has no Egg component");
@@ -71,22 +71,22 @@ namespace Interactions.Objects.Nests
             }
 
             _occupiedEggNetId = eggNetId;
-            _currentEgg = eggComp;
+            _currentEggEntity = eggComp;
  
             eggObj.transform.position = spawnTransform.position; 
             eggComp.OnHatched += HandleEggHatched;  
         }
  
         [Server]
-        private void HandleEggHatched(Egg egg)
+        private void HandleEggHatched(EggEntity eggEntity)
         { 
-            if (_currentEgg)
+            if (_currentEggEntity)
             {
-                _currentEgg.OnHatched -= HandleEggHatched;
+                _currentEggEntity.OnHatched -= HandleEggHatched;
             }
  
             _occupiedEggNetId = 0;
-            _currentEgg = null;
+            _currentEggEntity = null;
  
             if (_occupiedChickenNetId != 0 &&
                 NetworkServer.spawned.TryGetValue(_occupiedChickenNetId, out var chObj))
@@ -102,14 +102,14 @@ namespace Interactions.Objects.Nests
         [Server]
         public void ClearNest()
         { 
-            if (_currentEgg)
+            if (_currentEggEntity)
             {
-                _currentEgg.OnHatched -= HandleEggHatched;
+                _currentEggEntity.OnHatched -= HandleEggHatched;
             }
 
             _occupiedEggNetId = 0;
             _occupiedChickenNetId = 0;
-            _currentEgg = null;
+            _currentEggEntity = null;
             _currentHen = null;
         }
 
