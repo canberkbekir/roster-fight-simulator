@@ -1,9 +1,10 @@
 using System;
-using Creatures.Genes.Base; 
+using Creatures.Genes.Base;
 using Managers;
 using Mirror;
 using Services;
-using UnityEngine; 
+using UnityEngine;
+using Utils;
 
 namespace Creatures.Chickens.Eggs
 {
@@ -13,8 +14,11 @@ namespace Creatures.Chickens.Eggs
         [SerializeField] private float minHatchTime = 1f;
         [SerializeField] private float maxHatchTime = 60f;
 
-        private Gene[] _genes;
-        public Gene[] Genes => _genes ?? Array.Empty<Gene>();
+        public class SyncGeneList : SyncList<GeneSync> { }
+
+        public readonly SyncGeneList SyncedGenes = new SyncGeneList();
+
+        public Gene[] Genes => GeneHelper.GeneSyncToGene(SyncedGenes.ToArray());
 
         [SyncVar] public bool IsIncubating;
 
@@ -74,7 +78,7 @@ namespace Creatures.Chickens.Eggs
         {
             try
             {
-                _chickenSpawnerService.SpawnChickFromEggServer(transform.position, _genes);
+                _chickenSpawnerService.SpawnChickFromEggServer(transform.position, Genes);
                 NetworkServer.Destroy(gameObject);
                 Debug.Log($"[Egg:{name}] Hatched");
             }
@@ -94,7 +98,14 @@ namespace Creatures.Chickens.Eggs
 
         public void SetGenes(Gene[] newGenes)
         {
-            _genes = newGenes ?? Array.Empty<Gene>();
+            SyncedGenes.Clear();
+
+            if (newGenes == null || newGenes.Length == 0)
+                return;
+
+            var syncs = GeneHelper.GeneToGeneSync(newGenes);
+            foreach (var g in syncs)
+                SyncedGenes.Add(g);
         }
 
         private static void Clamp(ref float v, float min, float max) =>
