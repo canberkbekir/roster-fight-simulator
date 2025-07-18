@@ -3,9 +3,8 @@ using Mirror;
 using UnityEngine;
 using Creatures.Chickens.Base;
 using Creatures.Chickens.Base.Components;
-using Creatures.Chickens.Eggs;
+using Creatures.Chickens.Eggs.Components;
 using Creatures.Chickens.Roosters.Components;
-using Interactions.Objects.Nests;
 using Managers;
 using Services;
 
@@ -22,11 +21,10 @@ namespace Creatures.Chickens.Hens.Components
         [SyncVar] private bool isEggFertilized;
         [SyncVar] private bool eggReady;
         [SyncVar] private RoosterEntity fertilizedBy;
-        [SyncVar] private EggEntity _layedEggEntity;
-        
-        public EggEntity LayedEggEntity => _layedEggEntity;
+        [SyncVar] private EggEntity _layedEggEntity; 
         public float Progress => Mathf.Clamp01(progressTime / eggFormationDuration);
         public bool IsEggReady => eggReady;
+        public bool IsEggFertilized => isEggFertilized;
         
         public event Action OnEggFormed;
         public event Action OnEggLaid;
@@ -49,6 +47,7 @@ namespace Creatures.Chickens.Hens.Components
         [ServerCallback]
         private void Update()
         {
+            Debug.Log(progressTime + " / " + eggFormationDuration + " - " + Progress);
             if (!isProgressing || eggReady)
                 return;
 
@@ -82,9 +81,16 @@ namespace Creatures.Chickens.Hens.Components
         }
 
         [Server]
-        public void LayEggOnNest(Nest nest)
+        public void LayEggOnNest()
         {
-            if (nest == null || !eggReady)
+            if (!eggReady)
+            {
+                Debug.LogError("Cannot lay egg: either not progressing or egg is not ready.");
+                return;
+            }
+            var henEntity = Owner as HenEntity ?? throw new InvalidOperationException("Owner is not a HenEntity.");
+            var nest = henEntity.HenNestHandler.AssignedNest;
+            if (!nest || !eggReady)
             {
                 Debug.LogError("Cannot lay egg: either nest is null or egg is not ready.");
                 return;
@@ -92,14 +98,32 @@ namespace Creatures.Chickens.Hens.Components
 
             if (isEggFertilized)
             {
-               _layedEggEntity = _reproductionService.LayFertilizedEgg(Owner as HenEntity, fertilizedBy, nest);
+               _layedEggEntity = _reproductionService.LayEgg(Owner as HenEntity, fertilizedBy, nest);
             }
             else
             { 
-                _layedEggEntity = _reproductionService.LayUnfertilizedEgg(Owner as HenEntity, nest);
+                _layedEggEntity = _reproductionService.LayEgg(Owner as HenEntity, nest);
             }
             OnEggLaid?.Invoke();
             ResetProgress();
+        }
+        
+        public bool CanLayEgg()
+        {
+            var owner = Owner as HenEntity;
+            if (!eggReady)
+            {
+                Debug.LogWarning("Cannot lay egg: egg is already ready.");
+                return false;
+            }  
+            
+            if(owner != null && owner.HenNestHandler.AssignedNest.eggs.Count >= owner.HenNestHandler.AssignedNest.MaxEggCount)
+            {
+                Debug.LogWarning("Cannot lay egg: nest is full.");
+                return false;
+            }
+            
+            return true;
         }
         
         [Server]

@@ -828,7 +828,7 @@ MonoBehaviour:
   syncInterval: 0
   geneDataContainer: {fileID: 11400000, guid: 5e17180f6e2790a4cb1d65b6741277fa, type: 2}
   roosterEntityPrefab: {fileID: 8275249107842052983, guid: 2db79ee1c751ae047a64f3ed7bdd1cda, type: 3}
-  chickenEntityPrefab: {fileID: 8275249107842052983, guid: 75e5ab30e155bf5409823a4dd512bd30, type: 3}
+  henEntityPrefab: {fileID: 8275249107842052983, guid: 75e5ab30e155bf5409823a4dd512bd30, type: 3}
   chickEntityPrefab: {fileID: 6072749610977367117, guid: 2ca7a4e31bc3437438d422a6f2e9335d, type: 3}
 --- !u!1 &361863859
 GameObject:
@@ -1128,6 +1128,10 @@ PrefabInstance:
     - target: {fileID: 6250778752803995524, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
       propertyPath: m_Name
       value: Nest
+      objectReference: {fileID: 0}
+    - target: {fileID: 6882730818256832413, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
+      propertyPath: maxEggCount
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3141,6 +3145,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Nest (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6882730818256832413, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
+      propertyPath: maxEggCount
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3432,6 +3440,10 @@ PrefabInstance:
     - target: {fileID: 6250778752803995524, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
       propertyPath: m_Name
       value: Nest (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6882730818256832413, guid: 5132653bdd0e12741a3b43a2b5caafc0, type: 3}
+      propertyPath: maxEggCount
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4917,7 +4929,6 @@ GameObject:
   - component: {fileID: 2101798849}
   - component: {fileID: 2101798848}
   - component: {fileID: 2101798847}
-  - component: {fileID: 2101798851}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -5029,51 +5040,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2101798851
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2101798846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
-  runInBackground: 1
-  headlessStartMode: 0
-  editorAutoStart: 0
-  sendRate: 60
-  offlineScene: 
-  onlineScene: 
-  offlineSceneLoadDelay: 0
-  transport: {fileID: 0}
-  networkAddress: localhost
-  maxConnections: 100
-  disconnectInactiveConnections: 0
-  disconnectInactiveTimeout: 60
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 0}
-  autoCreatePlayer: 1
-  playerSpawnMethod: 0
-  spawnPrefabs: []
-  exceptionsDisconnect: 1
-  snapshotSettings:
-    bufferTimeMultiplier: 2
-    bufferLimit: 32
-    catchupNegativeThreshold: -1
-    catchupPositiveThreshold: 1
-    catchupSpeed: 0.019999999552965164
-    slowdownSpeed: 0.03999999910593033
-    driftEmaDuration: 1
-    dynamicAdjustment: 1
-    dynamicAdjustmentTolerance: 1
-    deliveryTimeEmaDuration: 2
-  evaluationMethod: 0
-  evaluationInterval: 3
-  timeInterpolationGui: 0
 --- !u!1 &2133112445
 GameObject:
   m_ObjectHideFlags: 0

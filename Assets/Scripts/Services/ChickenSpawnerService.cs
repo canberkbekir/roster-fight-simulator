@@ -11,6 +11,8 @@ using Creatures.Chickens.Chicks.Components;
 using Creatures.Genes;
 using Creatures.Genes.Base;
 using Creatures.Genes.Base.ScriptableObjects;
+using Interactions.Objects.Breeders;
+using Interactions.Objects.Nests;
 using Mirror;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -123,34 +125,7 @@ namespace Services
                     Debug.LogError("Unknown chicken type for spawning.");
                     return null;
             }
-        }
-
-        [Server]
-        public RoosterEntity SpawnRoosterServer(Vector3 spawnPos, Rooster rooster, Quaternion? spawnRot = null)
-        {
-            var rot = spawnRot ?? Quaternion.identity;
-            var entity = CreateRoosterEntity(rooster);
-            SpawnEntityInternal(entity, spawnPos, rot, null);
-            return entity;
-        }
-
-        [Server]
-        public HenEntity SpawnHenServer(Vector3 spawnPos, Hen hen, Quaternion? spawnRot = null)
-        {
-            var rot = spawnRot ?? Quaternion.identity;
-            var entity = CreateHenEntity(hen);
-            SpawnEntityInternal(entity, spawnPos, rot, null);
-            return entity;
-        }
-
-        [Server]
-        public ChickEntity SpawnChickServer(Vector3 spawnPos, Chick chickData, Quaternion? spawnRot = null)
-        {
-            var rot = spawnRot ?? Quaternion.identity;
-            var entity = CreateChickEntity(chickData);
-            SpawnEntityInternal(entity, spawnPos, rot, null);
-            return entity;
-        }
+        } 
 
         [Server]
         public ChickEntity SpawnChickFromEggServer(Vector3 spawnPos, Gene[] genes, Quaternion? spawnRot = null)
@@ -304,10 +279,37 @@ namespace Services
 
             if (entity.TryGetComponent(out InventorySystem.Base.ItemWorld itemWorld))
                 itemWorld.SetChicken(entity.Chicken);
-
+            entity.AssignBreeder(FindObjectOfType<Breeder>());//TODO: kaldirilması lazım ve generatormachineden yaratılan entityler envantere koyulmalı
             NetworkServer.Spawn(entity.gameObject, owner);
         }
 
+        [Server]
+        private RoosterEntity SpawnRoosterServer(Vector3 spawnPos, Rooster rooster, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            var entity = CreateRoosterEntity(rooster);
+            SpawnEntityInternal(entity, spawnPos, rot, null);
+            return entity;
+        }
+
+        [Server]
+        private HenEntity SpawnHenServer(Vector3 spawnPos, Hen hen, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            var entity = CreateHenEntity(hen);
+            SpawnEntityInternal(entity, spawnPos, rot, null);
+            return entity;
+        }
+
+        [Server]
+        private ChickEntity SpawnChickServer(Vector3 spawnPos, Chick chickData, Quaternion? spawnRot = null)
+        {
+            var rot = spawnRot ?? Quaternion.identity;
+            var entity = CreateChickEntity(chickData);
+            SpawnEntityInternal(entity, spawnPos, rot, null);
+            return entity;
+        }
+        
         #endregion
 
         #region Entity Creation

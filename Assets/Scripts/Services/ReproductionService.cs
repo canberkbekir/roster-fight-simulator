@@ -1,7 +1,6 @@
-using Creatures.Chickens.Eggs;
+using Creatures.Chickens.Eggs.Components;
 using Creatures.Chickens.Hens.Components;
 using Creatures.Chickens.Roosters.Components;
-using Creatures.Genes;
 using Creatures.Genes.Base;
 using Interactions.Objects.Nests;
 using Mirror;
@@ -13,132 +12,79 @@ namespace Services
     public class ReproductionService : NetworkBehaviour
     {
         [Header("Egg Settings")]
-        [Tooltip("Drag in your Egg prefab here. It must have an `Egg` component on it.")]
+        [Tooltip("Must be registered in the NetworkManager’s Spawnable Prefabs.")]
         [SerializeField] private GameObject eggPrefab;
-        
+
+        // Disable this entire component on clients
+        [ClientCallback]
+        private void Start()
+        {
+            if (!isServer)
+                enabled = false;
+        }
+
+        // Only runs on server
+        [ServerCallback]
         private void Awake()
         {
             if (eggPrefab == null)
-                Debug.LogError("[ReproductionService] eggPrefab is not assigned in the inspector.");
+                Debug.LogError("[ReproductionService] eggPrefab is not assigned.");
         }
 
         [Server]
-        public EggEntity LayFertilizedEgg(HenEntity mother, RoosterEntity father, Nest nest)
+        private EggEntity SpawnEgg(Nest nest, Gene[] genes)
         {
-            if (!mother || !father || !nest)
+            if (nest == null)
             {
-                Debug.LogError("[ReproductionService] BreedWithParents: one argument was null.");
+                Debug.LogError("[ReproductionService] SpawnEgg: nest is null!");
+                return null;
+            }
+
+            var eggObj = Instantiate(eggPrefab, nest.SpawnTransform.position, Quaternion.identity);
+            if (!eggObj.TryGetComponent<EggEntity>(out var egg))
+            {
+                Debug.LogError("[ReproductionService] eggPrefab has no EggEntity component!");
+                Destroy(eggObj);
+                return null;
+            }
+
+            egg.SetGenes(genes);
+            NetworkServer.Spawn(eggObj);
+            nest.AssignEgg(egg.netId);
+
+            return egg;
+        }
+
+        /// <summary>
+        /// Lay a fertilized egg (server only).
+        /// </summary>
+        [Server]
+        public EggEntity LayEgg(HenEntity mother, RoosterEntity father, Nest nest)
+        {
+            if (mother == null || father == null || nest == null)
+            {
+                Debug.LogError("[ReproductionService] LayEgg: one argument was null.");
                 return null;
             }
 
             var mixed = GeneHelper.GetCrossGenes(mother.Chicken.Genes, father.Chicken.Genes);
-            var mixedSync = GeneHelper.GeneToGeneSync(mixed);
+            return SpawnEgg(nest, mixed);
+        }
 
-            var newEggNetId = SpawnEggWithGenes(nest, mixedSync);
-            if (newEggNetId == 0)
+        /// <summary>
+        /// Lay an unfertilized egg (server only).
+        /// </summary>
+        [Server]
+        public EggEntity LayEgg(HenEntity mother, Nest nest)
+        {
+            if (mother == null || nest == null)
             {
-                Debug.LogError("[ReproductionService] Failed to spawn egg.");
+                Debug.LogError("[ReproductionService] LayEgg (unfertilized): one argument was null.");
                 return null;
             }
 
-            var spawnedEgg = nest.CurrentEggEntity;
-            if (spawnedEgg == null)
-                Debug.LogError("[ReproductionService] After spawning, nest.CurrentEgg is still null!");
-
-            return spawnedEgg;
-        }
-
-        [Server]
-        public EggEntity LayUnfertilizedEgg(HenEntity mother, Nest nest)
-        {
-            if (!mother || !nest)
-            {
-                Debug.LogError("[ReproductionService] LayUnfertilizedEgg: one argument was null.");
-                return null;
-            }
-
-            var passedGenes = GeneHelper.GetPassedGene(mother.Chicken.Genes);
-            var passedGeneSync = GeneHelper.GeneToGeneSync(passedGenes);
-
-            var newEggNetId = SpawnEggWithGenes(nest, passedGeneSync);
-            if (newEggNetId == 0)
-            {
-                Debug.LogError("[ReproductionService] Failed to spawn egg.");
-                return null;
-            }
-
-            var spawnedEgg = nest.CurrentEggEntity;
-            if (spawnedEgg == null)
-                Debug.LogError("[ReproductionService] After spawning, nest.CurrentEgg is still null!");
-
-            return spawnedEgg;
-        }
-
-        [Server]
-        public uint SpawnEggWithGenes(Nest nest, GeneSync[] geneSyncs)
-        {
-            if (!nest)
-            {
-                Debug.LogError("[ReproductionService] SpawnEggWithGenes: nest is null!");
-                return 0;
-            }
-
-            var pos = nest.SpawnTransform.position;
-            var eggObject = Instantiate(eggPrefab, pos, Quaternion.identity);
-            var eggComponent = eggObject.GetComponent<EggEntity>();
-            if (!eggComponent)
-            {
-                Debug.LogError("[ReproductionService] The eggPrefab has no Egg component attached.");
-                Destroy(eggObject);
-                return 0;
-            }
-            eggComponent.SetGenes(GeneHelper.GeneSyncToGene(geneSyncs)); 
-            NetworkServer.Spawn(eggObject);
-
-            var nid = eggObject.GetComponent<NetworkIdentity>();
-            if (!nid)
-            {
-                Debug.LogError("[ReproductionService] Spawned egg has no NetworkIdentity!");
-                return 0;
-            }
-            var newEggNetId = nid.netId;
-
-            nest.AssignEgg(newEggNetId);
-            return newEggNetId;
-        }
-        
-        [Server]
-        public uint SpawnEggWithGenes(Nest nest, Gene[] geneSyncs)
-        {
-            if (!nest)
-            {
-                Debug.LogError("[ReproductionService] SpawnEggWithGenes: nest is null!");
-                return 0;
-            }
-
-            var pos = nest.SpawnTransform.position;
-            var eggObject = Instantiate(eggPrefab, pos, Quaternion.identity);
-            var eggComponent = eggObject.GetComponent<EggEntity>();
-            if (!eggComponent)
-            {
-                Debug.LogError("[ReproductionService] The eggPrefab has no Egg component attached.");
-                Destroy(eggObject);
-                return 0;
-            }
-            eggComponent.SetGenes(geneSyncs);
-
-            NetworkServer.Spawn(eggObject);
-
-            var nid = eggObject.GetComponent<NetworkIdentity>();
-            if (!nid)
-            {
-                Debug.LogError("[ReproductionService] Spawned egg has no NetworkIdentity!");
-                return 0;
-            }
-            var newEggNetId = nid.netId;
-
-            nest.AssignEgg(newEggNetId);
-            return newEggNetId;
+            var passed = GeneHelper.GetPassedGene(mother.Chicken.Genes);
+            return SpawnEgg(nest, passed);
         }
     }
 }

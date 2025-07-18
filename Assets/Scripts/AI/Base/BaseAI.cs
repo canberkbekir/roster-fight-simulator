@@ -16,6 +16,13 @@ namespace AI.Base
         private float tickInterval = 0.1f;
 
         /// <summary>
+        ///  How close the AI must be to a target to consider it "reached".
+        /// </summary>
+        [PropertyRange(0.1f, 5f)]
+        [SerializeField]
+        private float hasReachedThreshold = 0.2f;
+        
+        /// <summary>
         /// Reference to the NavMeshAgent used for pathfinding and movement.
         /// </summary>
         [SerializeField]
@@ -85,11 +92,11 @@ namespace AI.Base
         /// </summary>
         /// <param name="position">Destination to check.</param>
         /// <param name="threshold">How close is "close enough" (in Unity units)?</param>
-        protected bool HasReached(Vector3 position, float threshold = 0.5f)
+        protected bool HasReached(Vector3 position)
         {
             if (!agent || !agent.isOnNavMesh) return false;
             if (agent.pathPending) return false;
-            return agent.remainingDistance <= threshold;
+            return agent.remainingDistance <= hasReachedThreshold;
         }
 
         /// <summary>

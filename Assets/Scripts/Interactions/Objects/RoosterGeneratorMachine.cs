@@ -17,6 +17,7 @@ namespace Interactions.Objects
         {
             base.OnInteract(interactor); 
             GameManager.Instance.ChickenSpawnerService.SpawnRandomServer(spawnPoint.position, fixedType, spawnPoint.rotation);
+            
         }
     }
 }

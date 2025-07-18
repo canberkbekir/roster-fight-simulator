@@ -42,7 +42,6 @@ namespace Players
         public class SyncListInv : SyncList<InventoryItem> { }
         public readonly SyncListInv items = new SyncListInv();
 
-        // Server: initialize with exactly maxSlots "empty" entries
         public override void OnStartServer()
         {
             base.OnStartServer();
@@ -53,7 +52,6 @@ namespace Players
             ChangeSelectedSlot(0);
         }
 
-        // Client: listen for changes to update UI
         public override void OnStartClient()
         {
             base.OnStartClient();
@@ -65,7 +63,6 @@ namespace Players
         {
             if (!isLocalPlayer) return;
 
-            // 1–9 keys
             for (int i = 0; i < MaxSlots && i < 9; i++)
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
                     ChangeSelectedSlot(i);
@@ -101,10 +98,10 @@ namespace Players
         }  
 
         [Server]
-        public void AddItem(string itemId, int qty, Rooster rooster)
+        public void AddItem(string itemId, int qty, Chicken chicken)
         { 
             var existing = items.FirstOrDefault(i =>
-                i.ItemId == itemId && i.Chicken == rooster && i.IsStackable && !i.IsEmpty);
+                i.ItemId == itemId && i.Chicken == chicken && i.IsStackable && !i.IsEmpty);
 
             if (!existing.IsEmpty)
             {
@@ -121,10 +118,10 @@ namespace Players
                     return;
                 }
                 var addQty = Mathf.Min(qty, maxStackSize);
-                items[idx] = new InventoryItem(itemId, ItemType.Resource, addQty, rooster);
+                items[idx] = new InventoryItem(itemId, ItemType.Resource, addQty, chicken);
             }
 
-            OnItemAdded?.Invoke(new InventoryItem(itemId, ItemType.Resource, qty, rooster));
+            OnItemAdded?.Invoke(new InventoryItem(itemId, ItemType.Resource, qty, chicken));
         }
 
         [Server]
@@ -162,15 +159,7 @@ namespace Players
 
             OnItemRemoved?.Invoke(existing);
         }
-
-        [Command]
-        public void CmdAddItem(string id, int q, Rooster r) => AddItem(id, q, r);
-
-        [Command]
-        public void CmdAddRooster(Rooster r) => AddChicken(r);
-
-        [Command]
-        public void CmdRemoveItem(string id, int q, Rooster r) => RemoveItem(id, q, r);
+        
 
         [Command]
         public void CmdDropSlot(int slotIndex)
@@ -182,7 +171,7 @@ namespace Players
             var dropPos = transform.position + transform.forward * dropDistance;
 
             if (item.IsChicken)
-                GameManager.Instance.ChickenSpawnerService.SpawnRoosterServer(dropPos, item.Chicken as Rooster);
+                GameManager.Instance.ChickenSpawnerService.SpawnChickenServer(dropPos, item.Chicken);
             else
             {
                 var data = GameManager.Instance.ContainerService.ItemDataContainer.Get(item.ItemId);

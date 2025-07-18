@@ -47,6 +47,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  maxGenes: 10
+  allowDuplicateGenes: 0
 --- !u!1 &1391850172461789189
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,6 +271,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  eggFormationDuration: 5
 --- !u!1 &3340948639684696880
 GameObject:
   m_ObjectHideFlags: 0
@@ -971,6 +974,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  minStatValue: 0
+  maxStatValue: 100
+  defaultStatValue: 50
   strength: 0
   agility: 0
   endurance: 0
@@ -1438,7 +1444,6 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  assignedNestUid: 0
 --- !u!1 &8013811881738790394
 GameObject:
   m_ObjectHideFlags: 0
@@ -1450,6 +1455,7 @@ GameObject:
   - component: {fileID: 6093905336906747531}
   - component: {fileID: 959944817670358597}
   - component: {fileID: 8545783909576193778}
+  - component: {fileID: 5141520226898003869}
   m_Layer: 9
   m_Name: AI
   m_TagString: Untagged
@@ -1498,9 +1504,6 @@ MonoBehaviour:
   nestSearchColor: {r: 0, g: 1, b: 0, a: 1}
   layEggDistance: 1
   incubateYOffset: 0.5
-  nestLayer:
-    serializedVersion: 2
-    m_Bits: 1024
 --- !u!114 &8545783909576193778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1517,6 +1520,28 @@ MonoBehaviour:
   henAI: {fileID: 959944817670358597}
   chickAI: {fileID: 0}
   stateText: {fileID: 5078063910801031290}
+--- !u!195 &5141520226898003869
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8013811881738790394}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &8217873399517032203
 GameObject:
   m_ObjectHideFlags: 0
@@ -1806,8 +1831,8 @@ MonoBehaviour:
   equipment: {fileID: 1969164283772462624}
   reproduction: {fileID: 8258850294865288350}
   ai: {fileID: 959944817670358597}
-  layingEggHandler: {fileID: 7105148152980446521}
-  nestHandler: {fileID: 8934860255333221563}
+  henEggHandler: {fileID: 7105148152980446521}
+  henNestHandler: {fileID: 8934860255333221563}
 --- !u!114 &3575680096342574043
 MonoBehaviour:
   m_ObjectHideFlags: 0
