@@ -77,8 +77,11 @@ namespace Creatures.Chickens.Base.Components
                 default:
                     return false;
             }
- 
-            if (femaleSide.IsPregnant) return false; 
+
+            if (maleSide.Owner.HungerHandler && !maleSide.Owner.HungerHandler.IsFed) return false;
+            if (femaleSide.Owner.HungerHandler && !femaleSide.Owner.HungerHandler.IsFed) return false;
+
+            if (femaleSide.IsPregnant) return false;
  
             femaleSide.MarkPregnant(maleSide.Owner.netId);
  

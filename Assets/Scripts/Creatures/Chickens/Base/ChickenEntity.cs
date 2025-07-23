@@ -19,6 +19,7 @@ namespace Creatures.Chickens.Base
         [SerializeField] protected ChickenAppearance appearance;
         [SerializeField] protected ChickenEquipment equipment;
         [SerializeField] protected ChickenReproduction reproduction;
+        [SerializeField] protected ChickenHungerHandler hungerHandler;
         [Space]
         [Header("— Chicken References —")]
         [SerializeField] protected BaseAI ai;
@@ -30,6 +31,7 @@ namespace Creatures.Chickens.Base
         public ChickenAppearance Appearance { get; protected set; }
         public ChickenEquipment Equipment { get; protected set; }
         public ChickenReproduction Reproduction { get; protected set; }
+        public ChickenHungerHandler HungerHandler { get; protected set; }
         public string ChickenName => chickenName;
         public ChickenGender Gender => Chicken.Gender;
         public ChickenEventBus EventBus { get; protected set; }
@@ -78,6 +80,7 @@ namespace Creatures.Chickens.Base
             Equipment = equipment ? equipment : GetComponent<ChickenEquipment>();
             Appearance = appearance ? appearance : GetComponent<ChickenAppearance>();
             Reproduction = reproduction ? reproduction : GetComponent<ChickenReproduction>();
+            HungerHandler = hungerHandler ? hungerHandler : GetComponent<ChickenHungerHandler>();
         }
         
         public virtual void Init(Chicken data)
@@ -93,6 +96,7 @@ namespace Creatures.Chickens.Base
             Appearance.Init(this); 
             Equipment.Init(this);
             Reproduction.Init(this);
+            HungerHandler.Init(this);
             Genome.Init(this, data.Genes);
 
             _isInitialized = true;

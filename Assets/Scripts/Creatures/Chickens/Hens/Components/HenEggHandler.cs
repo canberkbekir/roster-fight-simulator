@@ -51,6 +51,9 @@ namespace Creatures.Chickens.Hens.Components
             if (!isProgressing || eggReady)
                 return;
 
+            if (Owner && Owner.HungerHandler && !Owner.HungerHandler.IsFed)
+                return;
+
             progressTime += Time.deltaTime;
             if (progressTime < eggFormationDuration)
                 return;
