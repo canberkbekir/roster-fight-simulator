@@ -28,6 +28,9 @@ namespace Creatures.Chickens.Chicks.Components
         [ServerCallback]
         private void Update()
         {
+            if (Owner && Owner.HungerHandler && !Owner.HungerHandler.IsFed)
+                return;
+
             growthCooldown.Tick(Time.deltaTime);
         }
 
