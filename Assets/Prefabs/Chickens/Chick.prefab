@@ -918,8 +918,59 @@ Transform:
   - {fileID: 8854956570673248375}
   - {fileID: 2458180489649687404}
   - {fileID: 915694566373702294}
+  - {fileID: 8429768515227299443}
   m_Father: {fileID: 3473932249283123284}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4892530546118039042
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8429768515227299443}
+  - component: {fileID: 5611824186268500210}
+  m_Layer: 9
+  m_Name: HungerHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8429768515227299443
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4892530546118039042}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 381758858823588801}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5611824186268500210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4892530546118039042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9eaa3edecd94957a6ed0f7b93671f42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  maxHunger: 100
+  hungerDecayRate: 1
+  fedThreshold: 50
 --- !u!1 &5221655573632763428
 GameObject:
   m_ObjectHideFlags: 0
@@ -1208,6 +1259,7 @@ MonoBehaviour:
   appearance: {fileID: 8395448601642565072}
   equipment: {fileID: 5415792335585753965}
   reproduction: {fileID: 5781674094528113102}
+  hungerHandler: {fileID: 5611824186268500210}
   ai: {fileID: 5132058002898372745}
   chickGrowth: {fileID: 4097758562249015997}
 --- !u!114 &631919899570372302
@@ -1706,6 +1758,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   tickInterval: 1
+  hasReachedThreshold: 0.2
   agent: {fileID: 4118369126055265781}
   tickCooldown:
     duration: 0

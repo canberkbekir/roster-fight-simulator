@@ -453,6 +453,56 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+--- !u!1 &3523334726653345080
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3330220153974044122}
+  - component: {fileID: 7941177065839008564}
+  m_Layer: 9
+  m_Name: HungerHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3330220153974044122
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3523334726653345080}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5689943460716717034}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7941177065839008564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3523334726653345080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9eaa3edecd94957a6ed0f7b93671f42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  maxHunger: 100
+  hungerDecayRate: 1
+  fedThreshold: 50
 --- !u!1 &3555309984279313475
 GameObject:
   m_ObjectHideFlags: 0
@@ -1494,6 +1544,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   tickInterval: 1
+  hasReachedThreshold: 0.2
   agent: {fileID: 6740957189236644145}
   tickCooldown:
     duration: 0
@@ -1830,6 +1881,7 @@ MonoBehaviour:
   appearance: {fileID: 1612633076359501164}
   equipment: {fileID: 1969164283772462624}
   reproduction: {fileID: 8258850294865288350}
+  hungerHandler: {fileID: 7941177065839008564}
   ai: {fileID: 959944817670358597}
   henEggHandler: {fileID: 7105148152980446521}
   henNestHandler: {fileID: 8934860255333221563}
@@ -1887,6 +1939,7 @@ Transform:
   - {fileID: 723557954320238816}
   - {fileID: 4859101557109009990}
   - {fileID: 2418539263830187875}
+  - {fileID: 3330220153974044122}
   m_Father: {fileID: 9089817972910106211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8288628166702953548
